@@ -1,0 +1,27 @@
+[package]
+name = "stackbloatless"
+version = "0.1.0-alpha.0"
+authors = ["zer0-x"]
+edition = "2021"
+description = "A clean and effective interface for stackexchange sites"
+readme = "README.md"
+homepage = "https://github.com/zer0-x/stackbloatless"
+repository = "https://github.com/zer0-x/stackbloatless"
+license = "GPL-3.0"
+build = "build.rs"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[profile.release]
+strip = true
+
+[dependencies]
+relm4 = { version = "0.5.1", features = ["libadwaita", "macros"] }
+reqwest = { version = "0.11.14", features = ["json", "gzip"] }
+serde = { version = "1.0.157", features = ["derive"] }
+serde_json = { version = "1.0.94" }
+
+[dependencies.adw]
+package = "libadwaita"
+version = "0.2.1"
+features = ["v1_2"]
