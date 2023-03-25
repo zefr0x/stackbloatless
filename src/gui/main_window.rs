@@ -18,6 +18,7 @@ const APP_NAME: &str = "StackBloatLess";
 #[derive(Debug, Clone)]
 pub enum AppInput {
     RequestPages(Vec<stackexchange::Id>),
+    ToggleSearchEntry,
     ShowAboutWindow,
     Quit,
     ToggleSelectedTabPin,
@@ -31,6 +32,9 @@ pub struct AppModel {
 
 pub struct AppWidgets {
     tab_view: adw::TabView,
+    header: adw::HeaderBar,
+    search_entry: gtk::SearchEntry,
+    title_widget: adw::WindowTitle,
 }
 
 #[relm4::async_trait::async_trait(?Send)]
@@ -74,13 +78,13 @@ impl AsyncComponent for AppModel {
         root.set_content(Some(&main_layout));
 
         // Create header bar
+        let title_widget = adw::WindowTitle::builder()
+            .title(APP_NAME)
+            .subtitle("Your 1000 tabs are in safe hands")
+            .build();
+
         let header = adw::HeaderBar::builder()
-            .title_widget(
-                &adw::WindowTitle::builder()
-                    .title(APP_NAME)
-                    .subtitle("Your 1000 tabs are in safe hands")
-                    .build(),
-            )
+            .title_widget(&title_widget)
             .show_end_title_buttons(true)
             .build();
 
@@ -127,27 +131,30 @@ impl AsyncComponent for AppModel {
 
         header.pack_start(&menu_button);
 
-        // Create url input
-        let search_bar = gtk::Entry::builder()
-            // TODO: Change icon background to blue, and make it clickable.
-            .primary_icon_name("system-search-symbolic")
-            .primary_icon_activatable(true) // FIX: How to make it work?
-            // TODO: Just accept search terms
-            .placeholder_text("Enter a search term or question id")
-            .margin_start(13)
-            .margin_end(13)
-            .margin_top(10)
-            .margin_bottom(10)
+        // Search button and entry
+        let search_button = gtk::Button::builder()
+            .icon_name("system-search-symbolic")
             .build();
 
-        // TODO: Connect it to search api
-        search_bar.connect_activate(gtk::glib::clone!(@strong sender => move |entry| {
-            let buffer = entry.buffer();
-            sender.input(AppInput::RequestPages(vec![buffer.text().parse().unwrap()]));
-            buffer.delete_text(0, None);
+        search_button.connect_clicked(gtk::glib::clone!(@strong sender => move |_search_button| {
+            sender.input(AppInput::ToggleSearchEntry);
         }));
 
-        main_layout.append(&search_bar);
+        header.pack_start(&search_button);
+
+        let search_entry = gtk::SearchEntry::builder()
+            // TODO: Make icon clickable to select a stackexchange site to search in.
+            .placeholder_text("Enter a search term or question id")
+            .build();
+
+        search_entry.connect_activate(gtk::glib::clone!(@strong sender => move |entry| {
+            let search_term = entry.text();
+            // TODO: Change how search_term is parsed to support urls and terms at the same time.
+            // TODO: Connect it to search api
+            // TODO: Don't accept question id.
+            sender.input(AppInput::RequestPages(vec![search_term.parse().unwrap()]));
+            entry.delete_text(0, search_term.len() as i32);
+        }));
 
         // Create tab bar
         let tab_bar = adw::TabBar::builder()
@@ -189,7 +196,7 @@ impl AsyncComponent for AppModel {
 
         tab_view.connect_setup_menu(|view, page| {
             if let Some(page) = page {
-                view.set_selected_page(&page);
+                view.set_selected_page(page);
             }
         });
 
@@ -206,7 +213,12 @@ impl AsyncComponent for AppModel {
 
         // TODO: Create a libadwaita::TabOverview
 
-        let widgets = AppWidgets { tab_view };
+        let widgets = AppWidgets {
+            tab_view,
+            header,
+            search_entry,
+            title_widget,
+        };
 
         AsyncComponentParts { model, widgets }
     }
@@ -251,6 +263,16 @@ impl AsyncComponent for AppModel {
                     let body = question.body_markdown.clone();
 
                     buf.set_text(body.as_str());
+                }
+            }
+            AppInput::ToggleSearchEntry => {
+                if widgets.header.title_widget().unwrap() != widgets.search_entry {
+                    widgets.header.set_title_widget(Some(&widgets.search_entry));
+                    widgets.search_entry.show();
+                    widgets.search_entry.grab_focus();
+                } else {
+                    widgets.search_entry.hide();
+                    widgets.header.set_title_widget(Some(&widgets.title_widget));
                 }
             }
             AppInput::ShowAboutWindow => {
