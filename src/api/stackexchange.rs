@@ -109,7 +109,7 @@ impl StackExchange {
                 .as_str(),
         ));
 
-        let res = self.reqwest_client.get(url.clone()).send().await.unwrap();
+        let res = self.reqwest_client.get(url).send().await.unwrap();
 
         let value: json::Value = res.json().await.unwrap();
 
