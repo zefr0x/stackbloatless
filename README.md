@@ -1,11 +1,12 @@
 # StackBloatLess
 
-Blazingly fast, clean, and effective **native** desktop interface for **stackexchange** sites.
+Blazingly fast, clean, and effective **native** [Linux](https://en.wikipedia.org/wiki/Linux) desktop GUI for **StackExchange** sites.
 
 ## Features
 
-- 🤹 Tabs to open multible questions
+- 🤹 Tabs to open multiple questions
 - 🔖 Bookmarks `[TODO]`
+- 🔗 Can open URIs in form `stackexchange://{site}/{ids}`, so you can redirect links to it.
 - ⚙️ Proxy configurations `[TODO]`
 - 🚫 Microsoft Windows is not supported
 
