@@ -13,6 +13,7 @@ const API_QUESTIONS_FILTER: &str =
 const API_SITE_PAGESIZE: &str = "100";
 
 pub type Id = u32; // Since all operations are in strings not integers.
+pub type Uri = String;
 type Date = i64;
 
 #[derive(Debug, Clone, Deserialize)]
@@ -83,25 +84,29 @@ impl StackExchange {
         }
     }
 
-    pub async fn get_questions(&self, ids: Vec<Id>) -> Result<Vec<Question>, String> {
+    pub async fn get_questions_from_uri(&self, uri: String) -> Result<Vec<Question>, String> {
+        // Accept uris of form: stackexchange://{site}/{questions ids}
+        // For example: stackexchange://stackoverflow/123456;7891011;121314
+        let uri = Url::parse(uri.as_str()).unwrap();
+
+        self.get_questions(uri.domain().unwrap(), uri.path()).await
+    }
+
+    async fn get_questions(&self, site: &str, ids: &str) -> Result<Vec<Question>, String> {
         // Docs: https://api.stackexchange.com/docs/questions-by-ids
+        //
+        // `ids` are in form of a path with multiple ids separated by ;
+        // For example: /123456;78910;111213
         let mut url = Url::parse(API_ENDPOINT)
             .unwrap()
             .join(
                 format!(
-                    "questions/{}",
-                    ids.iter()
-                        .map(|id| id.to_string())
-                        .collect::<Vec<String>>()
-                        .join(";")
+                    "questions{}",
+                    ids
                 )
                 .as_str(),
             )
             .unwrap();
-
-        // TODO: Support all stackexchange sites
-        // https://api.stackexchange.com/docs/sites
-        let site = "stackoverflow";
 
         url.set_query(Some(
             format!("site={site}&filter={API_QUESTIONS_FILTER}&pagesize={API_SITE_PAGESIZE}")

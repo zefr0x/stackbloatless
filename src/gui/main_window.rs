@@ -17,7 +17,7 @@ const APP_NAME: &str = "StackBloatLess";
 
 #[derive(Debug, Clone)]
 pub enum AppInput {
-    RequestPages(Vec<stackexchange::Id>),
+    RequestPagesByUri(stackexchange::Uri),
     ToggleSearchEntry,
     ShowAboutWindow,
     Quit,
@@ -69,6 +69,16 @@ impl AsyncComponent for AppModel {
         let model = AppModel {
             stackexchange_client: stackexchange::StackExchange::new(),
         };
+
+        relm4::main_application().connect_open(
+            gtk::glib::clone!(@strong sender => move |_application, files, _hint| {
+                let uris = files.iter().map(|file| file.uri().to_string()).collect::<Vec<String>>();
+
+                for uri in uris {
+                    sender.input(AppInput::RequestPagesByUri(uri));
+                }
+            }),
+        );
 
         let main_layout = gtk::Box::builder()
             .orientation(gtk::Orientation::Vertical)
@@ -151,8 +161,9 @@ impl AsyncComponent for AppModel {
             let search_term = entry.text();
             // TODO: Change how search_term is parsed to support urls and terms at the same time.
             // TODO: Connect it to search api
-            // TODO: Don't accept question id.
-            sender.input(AppInput::RequestPages(vec![search_term.parse().unwrap()]));
+            // TODO: Don't accept uris.
+            // TODO: Support all stackexchange sites: https://api.stackexchange.com/docs/sites
+            sender.input(AppInput::RequestPagesByUri(format!("stackexchange://stackoverflow/{search_term}")));
             entry.delete_text(0, search_term.len() as i32);
         }));
 
@@ -231,8 +242,12 @@ impl AsyncComponent for AppModel {
         _root: &Self::Root,
     ) {
         match message {
-            AppInput::RequestPages(ids) => {
-                let questions = self.stackexchange_client.get_questions(ids).await.unwrap();
+            AppInput::RequestPagesByUri(uri) => {
+                let questions = self
+                    .stackexchange_client
+                    .get_questions_from_uri(uri)
+                    .await
+                    .unwrap();
 
                 for question in questions {
                     let vbox = gtk::Box::builder()
