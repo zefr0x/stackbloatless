@@ -275,9 +275,9 @@ impl AsyncComponent for AppModel {
 
                     // Set buffer text.
                     let buf = question_view.buffer();
-                    let body = question.body_markdown.clone();
+                    let body = question.body_markdown;
 
-                    buf.set_text(body.as_str());
+                    buf.insert_markup(&mut buf.end_iter(), body.as_str());
                 }
             }
             AppInput::ToggleSearchEntry => {
