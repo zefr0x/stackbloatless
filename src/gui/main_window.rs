@@ -8,7 +8,7 @@ use relm4::{
         traits::{GtkApplicationExt, TextBufferExt, TextViewExt, WidgetExt},
     },
     loading_widgets::LoadingWidgets,
-    prelude::gtk,
+    prelude::*,
 };
 
 use crate::api::stackexchange;
@@ -26,6 +26,10 @@ pub enum AppInput {
     ClosePinnedTab,
 }
 
+pub struct AppInit {
+    pub receiver: relm4::Receiver<AppInput>,
+}
+
 pub struct AppModel {
     stackexchange_client: stackexchange::StackExchange,
 }
@@ -39,7 +43,7 @@ pub struct AppWidgets {
 
 #[relm4::async_trait::async_trait(?Send)]
 impl AsyncComponent for AppModel {
-    type Init = ();
+    type Init = AppInit;
     type Root = adw::Window;
     type Widgets = AppWidgets;
     type Input = AppInput;
@@ -62,7 +66,7 @@ impl AsyncComponent for AppModel {
     }
 
     async fn init(
-        _init: Self::Init,
+        init: Self::Init,
         root: Self::Root,
         sender: AsyncComponentSender<Self>,
     ) -> AsyncComponentParts<Self> {
@@ -70,14 +74,10 @@ impl AsyncComponent for AppModel {
             stackexchange_client: stackexchange::StackExchange::new(),
         };
 
-        relm4::main_application().connect_open(
-            gtk::glib::clone!(@strong sender => move |_application, files, _hint| {
-                let uris = files.iter().map(|file| file.uri().to_string()).collect::<Vec<String>>();
-
-                for uri in uris {
-                    sender.input(AppInput::RequestPagesByUri(uri));
-                }
-            }),
+        // Listen to messages sent from the main function.
+        sender.oneshot_command(
+            init.receiver
+                .forward(sender.input_sender().to_owned(), |msg| msg),
         );
 
         let main_layout = gtk::Box::builder()
