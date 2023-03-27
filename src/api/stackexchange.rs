@@ -74,10 +74,6 @@ impl StackExchange {
     pub fn new() -> Self {
         Self {
             reqwest_client: reqwest::Client::builder()
-                .user_agent(
-                    // TODO: Maybe use better UserAgent
-                    "Mozilla/5.0 (X11; Linux x86_64; rv:112.0) Gecko/20100101 Firefox/112.0",
-                )
                 .gzip(true)
                 .build()
                 .unwrap(),
