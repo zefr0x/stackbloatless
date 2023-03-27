@@ -4,7 +4,7 @@ use relm4::gtk;
 mod api;
 mod gui;
 
-const APP_ID: &str = "io.github.zer0-x.stackbloatless";
+const APP_ID: &str = "io.github.zer0_x.stackbloatless";
 
 fn main() {
     let base_app = adw::Application::builder()
@@ -24,6 +24,8 @@ fn main() {
             }
         }),
     );
+
+    // FIX: Close remote instance after sending the `open` signal.
 
     base_app.connect_startup(|application| {
         application.activate();
