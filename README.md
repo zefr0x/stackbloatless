@@ -1,14 +1,20 @@
-# StackBloatLess
+<div align = center>
+
+<h1>StackBloatLess</h1>
 
 Blazingly fast, clean, and effective **native** [Linux](https://en.wikipedia.org/wiki/Linux) desktop GUI for **StackExchange** sites.
 
+</div>
+
 ## Features
 
-- 🤹 Tabs to open multiple questions
-- 🔖 Bookmarks `[TODO]`
-- 🔗 Can open URIs in form `stackexchange://{site}/{ids}`, so you can redirect links to it.
+- 📜 Clean questions, answers, and comments without any distractions. `[WIP]`
+- 🤹 Tabs to open multiple questions.
+- 🔖 Bookmarks. `[TODO]`
+- 🔗 Can open URIs, so you can redirect StackExchange links to it.
 - ⚙️ Proxy configurations `[TODO]`
-- 🚫 Microsoft Windows is not supported
+- 🔎 Simple search engine support. `[TODO]`
+- 🚫 Microsoft Windows is not supported.
 
 ## Installation
 
@@ -29,6 +35,18 @@ cargo build --release
 ```
 
 You will find the binary in `./target/release/stackbloatless`
+
+## How to use it?
+
+You are able to search for questions from the application using StackExchange's search API, but it's very primitive, so you might not find what you are searching for.
+
+You are recomended to use a web browser and your search engine of choice along with a browser extension to redirect any questions under the StackExchange network to be opened inside StackBloatLess.
+
+StackBloatLess accept StackExchange questions in the next format to be opened in it:
+```
+stackexchange://{api_site_parameter}/{ids}
+```
+Where `{api_site_parameter}` is specific to single StackExchange site that could be found [here](https://api.stackexchange.com/docs/sites#pagesize=500&filter=!SldCuNUOz*uwhNyRzh&run=true), and `{ids}` is a list of questions ids seprated by `;`, like `id;id;id;id...`.
 
 ## Inspired by
 
