@@ -17,9 +17,9 @@ strip = true
 
 [dependencies]
 relm4 = { version = "0.5.1", features = ["libadwaita", "macros"] }
-reqwest = { version = "0.11.14", features = ["json", "gzip"] }
-serde = { version = "1.0.157", features = ["derive"] }
-serde_json = { version = "1.0.94" }
+reqwest = { version = "0.11.16", features = ["json", "gzip"] }
+serde = { version = "1.0.159", features = ["derive"] }
+serde_json = { version = "1.0.95" }
 
 [dependencies.adw]
 package = "libadwaita"
