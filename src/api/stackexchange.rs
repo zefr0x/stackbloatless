@@ -50,7 +50,7 @@ pub struct Answer {
 #[derive(Debug, Clone, Deserialize)]
 pub struct Question {
     pub answer_count: u32,
-    pub answers: Vec<Answer>,
+    pub answers: Option<Vec<Answer>>,
     pub body_markdown: String,
     pub comment_count: u32,
     pub comments: Option<Vec<Comment>>,
@@ -73,10 +73,7 @@ pub struct StackExchange {
 impl StackExchange {
     pub fn new() -> Self {
         Self {
-            reqwest_client: reqwest::Client::builder()
-                .gzip(true)
-                .build()
-                .unwrap(),
+            reqwest_client: reqwest::Client::builder().gzip(true).build().unwrap(),
         }
     }
 
@@ -84,6 +81,9 @@ impl StackExchange {
         // Accept uris of form: stackexchange://{site}/{questions ids}
         // For example: stackexchange://stackoverflow/123456;7891011;121314
         let uri = Url::parse(uri.as_str()).unwrap();
+
+        // TODO: Check if shame is stackexchange or not.
+        // TODO: Check if questions ids are valid.
 
         self.get_questions(uri.domain().unwrap(), uri.path()).await
     }
@@ -95,13 +95,7 @@ impl StackExchange {
         // For example: /123456;78910;111213
         let mut url = Url::parse(API_ENDPOINT)
             .unwrap()
-            .join(
-                format!(
-                    "questions{}",
-                    ids
-                )
-                .as_str(),
-            )
+            .join(format!("questions{}", ids).as_str())
             .unwrap();
 
         url.set_query(Some(
