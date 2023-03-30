@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.5
+Type=Application
+Name=StackBloatLess
+Comment=Clean and effective native GUI for StackExchange sites
+GenericName=StackExchange Interface
+Exec=stackbloatless %U
+MimeType=x-scheme-handler/stackexchange
+Icon=io.github.zer0_x.stackbloatless
+Terminal=false
+Categories=Development
+Keywords=stackexchange;stackoverflow;
