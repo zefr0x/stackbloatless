@@ -37,6 +37,7 @@ pub struct AppModel {
 pub struct AppWidgets {
     tab_view: adw::TabView,
     header: adw::HeaderBar,
+    search_button: gtk::ToggleButton,
     search_entry: gtk::SearchEntry,
     title_widget: adw::WindowTitle,
 }
@@ -142,7 +143,7 @@ impl AsyncComponent for AppModel {
         header.pack_start(&menu_button);
 
         // Search button and entry
-        let search_button = gtk::Button::builder()
+        let search_button = gtk::ToggleButton::builder()
             .icon_name("system-search-symbolic")
             .build();
 
@@ -227,6 +228,7 @@ impl AsyncComponent for AppModel {
         let widgets = AppWidgets {
             tab_view,
             header,
+            search_button,
             search_entry,
             title_widget,
         };
@@ -281,7 +283,7 @@ impl AsyncComponent for AppModel {
                 }
             }
             AppInput::ToggleSearchEntry => {
-                if widgets.header.title_widget().unwrap() != widgets.search_entry {
+                if widgets.search_button.is_active() {
                     widgets.header.set_title_widget(Some(&widgets.search_entry));
                     widgets.search_entry.show();
                     widgets.search_entry.grab_focus();
