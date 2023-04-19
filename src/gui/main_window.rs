@@ -5,12 +5,13 @@ use relm4::{
     component::{AsyncComponent, AsyncComponentParts, AsyncComponentSender},
     gtk::{
         prelude::ApplicationExt,
-        traits::{GtkApplicationExt, TextBufferExt, TextViewExt, WidgetExt},
+        traits::{GtkApplicationExt, WidgetExt},
     },
     loading_widgets::LoadingWidgets,
     prelude::*,
 };
 
+use super::componant_builders;
 use crate::api::stackexchange;
 
 const APP_NAME: &str = "StackBloatLess";
@@ -75,16 +76,24 @@ impl AsyncComponent for AppModel {
             stackexchange_client: stackexchange::StackExchange::new(),
         };
 
+        // Load CSS
+        let provider = gtk::CssProvider::new();
+        provider.load_from_data(include_bytes!("style.css"));
+        if let Some(display) = gtk::gdk::Display::default() {
+            gtk::StyleContext::add_provider_for_display(
+                &display,
+                &provider,
+                gtk::STYLE_PROVIDER_PRIORITY_APPLICATION,
+            );
+        }
+
         // Listen to messages sent from the main function.
         sender.oneshot_command(
             init.receiver
                 .forward(sender.input_sender().to_owned(), |msg| msg),
         );
 
-        let main_layout = gtk::Box::builder()
-            .orientation(gtk::Orientation::Vertical)
-            .spacing(5)
-            .build();
+        let main_layout = gtk::Box::new(gtk::Orientation::Vertical, 5);
 
         root.set_content(Some(&main_layout));
 
@@ -247,39 +256,22 @@ impl AsyncComponent for AppModel {
             AppInput::RequestPagesByUri(uri) => {
                 let questions = self
                     .stackexchange_client
-                    .get_questions_from_uri(uri)
+                    .get_questions_from_uri(&uri)
                     .await
                     .unwrap();
 
                 for question in questions {
-                    let vbox = gtk::Box::builder()
-                        .orientation(gtk::Orientation::Vertical)
-                        .spacing(5)
-                        .build();
+                    let question_box = componant_builders::st_question(&question);
 
-                    let tab_page = widgets.tab_view.append(&vbox);
-                    tab_page.set_title(question.title.as_str());
+                    let tab_page = widgets.tab_view.append(
+                        &gtk::ScrolledWindow::builder()
+                            .child(&question_box)
+                            .vexpand(true)
+                            .hexpand(true)
+                            .build(),
+                    );
 
-                    // TODO: Create a stackexchange question wedget factory.
-                    let question_view = gtk::TextView::builder()
-                        .wrap_mode(gtk::WrapMode::Word)
-                        .editable(false)
-                        .css_classes(Vec::from(["background".to_string(), "frame".to_string()]))
-                        .css_classes(
-                            ["background", "frame"]
-                                .iter()
-                                .map(|class| class.to_string())
-                                .collect(),
-                        )
-                        .build();
-
-                    vbox.append(&question_view);
-
-                    // Set buffer text.
-                    let buf = question_view.buffer();
-                    let body = question.body_markdown;
-
-                    buf.insert_markup(&mut buf.end_iter(), body.as_str());
+                    tab_page.set_title(&question.title);
                 }
             }
             AppInput::ToggleSearchEntry => {

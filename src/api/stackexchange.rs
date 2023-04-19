@@ -77,10 +77,10 @@ impl StackExchange {
         }
     }
 
-    pub async fn get_questions_from_uri(&self, uri: String) -> Result<Vec<Question>, String> {
+    pub async fn get_questions_from_uri(&self, uri: &str) -> Result<Vec<Question>, String> {
         // Accept uris of form: stackexchange://{site}/{questions ids}
         // For example: stackexchange://stackoverflow/123456;7891011;121314
-        let uri = Url::parse(uri.as_str()).unwrap();
+        let uri = Url::parse(uri).unwrap();
 
         // TODO: Check if shame is stackexchange or not.
         // TODO: Check if questions ids are valid.
@@ -95,13 +95,12 @@ impl StackExchange {
         // For example: /123456;78910;111213
         let mut url = Url::parse(API_ENDPOINT)
             .unwrap()
-            .join(format!("questions{}", ids).as_str())
+            .join(&format!("questions{}", ids))
             .unwrap();
 
-        url.set_query(Some(
-            format!("site={site}&filter={API_QUESTIONS_FILTER}&pagesize={API_SITE_PAGESIZE}")
-                .as_str(),
-        ));
+        url.set_query(Some(&format!(
+            "site={site}&filter={API_QUESTIONS_FILTER}&pagesize={API_SITE_PAGESIZE}"
+        )));
 
         let res = self.reqwest_client.get(url).send().await.unwrap();
 

@@ -861,6 +861,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "markdown"
+version = "1.0.0-alpha.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "98de49c677e95e00eaa74c42a0b07ea55e1e0b1ebca5b2cbc7657f288cd714eb"
+dependencies = [
+ "unicode-id",
+]
+
+[[package]]
 name = "memchr"
 version = "2.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1353,6 +1362,7 @@ name = "stackbloatless"
 version = "0.1.0-alpha.0"
 dependencies = [
  "libadwaita",
+ "markdown",
  "relm4",
  "reqwest",
  "serde",
@@ -1565,6 +1575,12 @@ name = "unicode-bidi"
 version = "0.3.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "92888ba5573ff080736b3648696b70cafad7d250551175acbaa4e0385b3e1460"
+
+[[package]]
+name = "unicode-id"
+version = "0.3.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d70b6494226b36008c8366c288d77190b3fad2eb4c10533139c1c1f461127f1a"
 
 [[package]]
 name = "unicode-ident"
