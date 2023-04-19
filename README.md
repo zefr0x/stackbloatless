@@ -18,6 +18,11 @@ Blazingly fast, clean, and effective **native** [Linux](https://en.wikipedia.org
 
 ## Installation
 
+### Download Binary From Github
+For every new release a Github workflow will build a binary in Github servers and will upload it as a release asset in Github releases.
+
+You can find the latest Github release [here](https://github.com/zer0-x/stackbloatless/releases/latest) or the releases page [here](https://github.com/zer0-x/stackbloatless/releases).
+
 ## Build
 
 > **Note**
