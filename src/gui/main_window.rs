@@ -99,8 +99,6 @@ impl AsyncComponent for AppModel {
 
         let main_layout = gtk::Box::new(gtk::Orientation::Vertical, 5);
 
-        root.set_content(Some(&main_layout));
-
         // Create header bar
         let title_widget = adw::WindowTitle::builder()
             .title(APP_NAME)
@@ -181,18 +179,6 @@ impl AsyncComponent for AppModel {
             entry.delete_text(0, search_term.len() as i32);
         }));
 
-        // Create tab bar
-        let tab_bar = adw::TabBar::builder()
-            .css_classes(Vec::from(["inline".to_string()]))
-            // TODO: Create a libadwaita::TabButton
-            // .end_action_widget()
-            .build();
-        main_layout.append(&tab_bar);
-
-        let tab_view = adw::TabView::new();
-        main_layout.append(&tab_view);
-        tab_bar.set_view(Some(&tab_view));
-
         // Create tab actions
         relm4::new_action_group!(TabActionGroup, "tab");
         relm4::new_stateless_action!(PinTabAction, TabActionGroup, "toggle_pin");
@@ -219,12 +205,6 @@ impl AsyncComponent for AppModel {
             root.insert_action_group("tab", Some(&group.into_action_group()))
         }
 
-        tab_view.connect_setup_menu(|view, page| {
-            if let Some(page) = page {
-                view.set_selected_page(page);
-            }
-        });
-
         relm4::menu! {
             tab_menu: {
                 "Pin/Unpin" => PinTabAction,
@@ -234,9 +214,38 @@ impl AsyncComponent for AppModel {
 
         relm4::main_application().set_accelerators_for_action::<CloseTabAction>(&["<Control>w"]);
 
-        tab_view.set_menu_model(Some(&tab_menu));
+        // Create tab bar
+        let tab_bar = adw::TabBar::builder().css_classes(["inline"]).build();
+        main_layout.append(&tab_bar);
 
-        // TODO: Create a libadwaita::TabOverview
+        // Create tab view
+        let tab_view = adw::TabView::builder().menu_model(&tab_menu).build();
+        main_layout.append(&tab_view);
+
+        tab_bar.set_view(Some(&tab_view));
+
+        tab_view.connect_setup_menu(|view, page| {
+            if let Some(page) = page {
+                view.set_selected_page(page);
+            }
+        });
+
+        // Create tab button in the header
+        let tab_button = adw::TabButton::builder()
+            .view(&tab_view)
+            .action_name("overview.open")
+            .build();
+        header.pack_end(&tab_button);
+
+        // Create tabs overview
+        // FIX: Whene the last tab is closed, close the overview.
+        let tab_overview = adw::TabOverview::builder()
+            .view(&tab_view)
+            // TODO: Implement new tab
+            // .enable_new_tab(true)
+            .child(&main_layout)
+            .build();
+        root.set_content(Some(&tab_overview));
 
         let widgets = AppWidgets {
             tab_view,
@@ -274,6 +283,9 @@ impl AsyncComponent for AppModel {
                             .hexpand(true)
                             .build(),
                     );
+
+                    // TODO: Pass question tags as keywords.
+                    // tab_page.set_keyword(keyword);
 
                     tab_page.set_title(&question.title);
                 }
