@@ -10,6 +10,7 @@ use relm4::{
     loading_widgets::LoadingWidgets,
     prelude::*,
 };
+use relm4_icons::icon_name;
 
 use super::componant_builders;
 use crate::api::stackexchange;
@@ -87,6 +88,9 @@ impl AsyncComponent for AppModel {
             );
         }
 
+        // Load icons
+        relm4_icons::initialize_icons();
+
         // Listen to messages sent from the main function.
         sender.oneshot_command(
             init.receiver
@@ -145,7 +149,7 @@ impl AsyncComponent for AppModel {
 
         // Create hamburger menu
         let menu_button = gtk::MenuButton::builder()
-            .icon_name("open-menu-symbolic")
+            .icon_name(icon_name::MENU_LARGE)
             .menu_model(&main_menu)
             .build();
 
@@ -153,7 +157,7 @@ impl AsyncComponent for AppModel {
 
         // Search button and entry
         let search_button = gtk::ToggleButton::builder()
-            .icon_name("system-search-symbolic")
+            .icon_name(icon_name::LOUPE)
             .build();
 
         search_button.connect_clicked(gtk::glib::clone!(@strong sender => move |_search_button| {
