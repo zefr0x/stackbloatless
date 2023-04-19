@@ -78,9 +78,9 @@ impl AsyncComponent for AppModel {
 
         // Load CSS
         let provider = gtk::CssProvider::new();
-        provider.load_from_data(include_bytes!("style.css"));
+        provider.load_from_data(include_str!("style.css"));
         if let Some(display) = gtk::gdk::Display::default() {
-            gtk::StyleContext::add_provider_for_display(
+            gtk::style_context_add_provider_for_display(
                 &display,
                 &provider,
                 gtk::STYLE_PROVIDER_PRIORITY_APPLICATION,
@@ -115,7 +115,7 @@ impl AsyncComponent for AppModel {
         relm4::new_stateless_action!(AboutAction, MenuActionGroup, "about");
         relm4::new_stateless_action!(QuitAction, MenuActionGroup, "quit");
         {
-            let group = relm4::actions::RelmActionGroup::<MenuActionGroup>::new();
+            let mut group = relm4::actions::RelmActionGroup::<MenuActionGroup>::new();
 
             let about_action: relm4::actions::RelmAction<AboutAction> =
                 relm4::actions::RelmAction::new_stateless(
@@ -123,7 +123,7 @@ impl AsyncComponent for AppModel {
                         sender.input(AppInput::ShowAboutWindow);
                     }),
                 );
-            group.add_action(&about_action);
+            group.add_action(about_action);
 
             let quit_action: relm4::actions::RelmAction<QuitAction> =
                 relm4::actions::RelmAction::new_stateless(
@@ -131,7 +131,7 @@ impl AsyncComponent for AppModel {
                         sender.input(AppInput::Quit);
                     }),
                 );
-            group.add_action(&quit_action);
+            group.add_action(quit_action);
 
             root.insert_action_group("menu", Some(&group.into_action_group()))
         }
@@ -194,7 +194,7 @@ impl AsyncComponent for AppModel {
         relm4::new_stateless_action!(PinTabAction, TabActionGroup, "toggle_pin");
         relm4::new_stateless_action!(CloseTabAction, TabActionGroup, "close");
         {
-            let group = relm4::actions::RelmActionGroup::<TabActionGroup>::new();
+            let mut group = relm4::actions::RelmActionGroup::<TabActionGroup>::new();
 
             let tab_pin_action: relm4::actions::RelmAction<PinTabAction> =
                 relm4::actions::RelmAction::new_stateless(
@@ -202,7 +202,7 @@ impl AsyncComponent for AppModel {
                         sender.input(AppInput::ToggleSelectedTabPin);
                     }),
                 );
-            group.add_action(&tab_pin_action);
+            group.add_action(tab_pin_action);
 
             let close_tab_action: relm4::actions::RelmAction<CloseTabAction> =
                 relm4::actions::RelmAction::new_stateless(
@@ -210,7 +210,7 @@ impl AsyncComponent for AppModel {
                         sender.input(AppInput::CloseTab);
                     }),
                 );
-            group.add_action(&close_tab_action);
+            group.add_action(close_tab_action);
 
             root.insert_action_group("tab", Some(&group.into_action_group()))
         }
@@ -285,11 +285,7 @@ impl AsyncComponent for AppModel {
                 }
             }
             AppInput::ShowAboutWindow => {
-                let developers = env!("CARGO_PKG_AUTHORS")
-                    .to_string()
-                    .split(':')
-                    .map(|author| author.to_string())
-                    .collect();
+                let developers: Vec<&str> = env!("CARGO_PKG_AUTHORS").split(':').collect();
 
                 let about_window = adw::AboutWindow::builder()
                     .application_name(APP_NAME)

@@ -11,7 +11,7 @@ pub fn st_question(question: &Question) -> gtk::Box {
         &gtk::Label::builder()
             .selectable(true)
             .label(&question.title)
-            .css_classes(vec!["title-1".to_owned()])
+            .css_classes(["title-1"])
             .wrap(true)
             .wrap_mode(gtk::pango::WrapMode::Char)
             .margin_start(5)
@@ -34,14 +34,14 @@ pub fn st_question(question: &Question) -> gtk::Box {
         question_header.append(
             &gtk::Label::builder()
                 .label("Answered")
-                .css_classes(vec!["success".to_owned(), "heading".to_owned()])
+                .css_classes(["success", "heading"])
                 .build(),
         );
     } else {
         question_header.append(
             &gtk::Label::builder()
                 .label("Not Answered")
-                .css_classes(vec!["warning".to_owned(), "heading".to_owned()])
+                .css_classes(["warning", "heading"])
                 .build(),
         )
     }
@@ -69,9 +69,9 @@ pub fn st_question(question: &Question) -> gtk::Box {
             .margin_start(10)
             .margin_end(10)
             .css_classes(if question.score >= 0 {
-                vec!["success".to_owned()]
+                ["success"]
             } else {
-                vec!["error".to_owned()]
+                ["error"]
             })
             .build(),
     );

@@ -113,12 +113,7 @@ pub fn md2gtk(markdown_text: &str) -> gtk::TextView {
     let text_view = gtk::TextView::builder()
         .wrap_mode(gtk::WrapMode::Word)
         .editable(false)
-        .css_classes(
-            ["body", "body_buffer"]
-                .iter()
-                .map(|class| class.to_string())
-                .collect(),
-        )
+        .css_classes(["body", "body_buffer"])
         .margin_top(10)
         .margin_start(10)
         .margin_end(10)

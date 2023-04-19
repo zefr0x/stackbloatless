@@ -31,10 +31,7 @@ fn main() {
         application.activate();
     });
 
-    let args = std::env::args().collect::<Vec<String>>();
-
-    let init = gui::main_window::AppInit { receiver };
-
-    relm4::RelmApp::with_app(base_app)
-        .run_async_with_args::<gui::main_window::AppModel, String>(init, &args);
+    relm4::RelmApp::from_app(base_app)
+        .with_args(std::env::args().collect::<Vec<String>>())
+        .run_async::<gui::main_window::AppModel>(gui::main_window::AppInit { receiver });
 }
