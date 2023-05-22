@@ -145,6 +145,8 @@ impl AsyncComponent for AppModel {
             }
         }
 
+        relm4::main_application().set_accelerators_for_action::<QuitAction>(&["<Control>q"]);
+
         // Create hamburger menu
         let menu_button = gtk::MenuButton::builder()
             .icon_name(icon_name::MENU_LARGE)
