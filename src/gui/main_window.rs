@@ -17,6 +17,9 @@ use crate::api::stackexchange;
 
 const APP_NAME: &str = "StackBloatLess";
 
+// Save build-time informations
+shadow_rs::shadow!(build);
+
 #[derive(Debug, Clone)]
 pub enum AppInput {
     RequestPagesByUri(stackexchange::Uri),
@@ -113,6 +116,7 @@ impl AsyncComponent for AppModel {
         main_layout.append(&header);
 
         // Create menu actions
+        // TODO: Create action to show GtkShortcutsWindow.
         relm4::new_action_group!(MenuActionGroup, "menu");
         relm4::new_stateless_action!(AboutAction, MenuActionGroup, "about");
         relm4::new_stateless_action!(QuitAction, MenuActionGroup, "quit");
@@ -269,6 +273,7 @@ impl AsyncComponent for AppModel {
     ) {
         match message {
             AppInput::RequestPagesByUri(uri) => {
+                // TODO: Handle request errors.
                 let questions = self
                     .stackexchange_client
                     .get_questions_from_uri(&uri)
@@ -315,6 +320,46 @@ impl AsyncComponent for AppModel {
                     .issue_url("https://github.com/zer0-x/stackbloatless/issues")
                     .application(&relm4::main_application())
                     .transient_for(&relm4::main_application().active_window().unwrap())
+                    .debug_info(format!(
+                        "[rust]\n\
+                        {}\n\
+                        {}\n\
+                        {}\n\
+                        {}\n\n\
+                        [traget]\n\
+                        {}\n\n\
+                        [source]\n\
+                        branch: {}\n\
+                        commit: {}\n\
+                        clean: {}\n\n\
+                        [runtime]\n\
+                        GTK: {}.{}.{}\n\
+                        Adwaita: {}.{}.{}\n\
+                        Cairo: {}\n\
+                        Pango: {}\n\
+                        Session Type: {}\n\
+                        Session Desktop: {}\n\
+                        Current Desktop: {}",
+                        build::BUILD_OS,
+                        build::CARGO_VERSION,
+                        build::RUST_CHANNEL,
+                        build::RUST_VERSION,
+                        build::BUILD_TARGET,
+                        build::BRANCH,
+                        build::COMMIT_HASH,
+                        build::GIT_CLEAN,
+                        gtk::major_version(),
+                        gtk::minor_version(),
+                        gtk::micro_version(),
+                        adw::major_version(),
+                        adw::minor_version(),
+                        adw::micro_version(),
+                        gtk::cairo::version_string(),
+                        gtk::pango::version_string(),
+                        std::env::var("XDG_SESSION_TYPE").unwrap_or("Undetected".to_string()),
+                        std::env::var("XDG_SESSION_DESKTOP").unwrap_or("Undetected".to_string()),
+                        std::env::var("XDG_CURRENT_DESKTOP").unwrap_or("Undetected".to_string()),
+                    ))
                     .build();
 
                 about_window.add_link(
