@@ -6,7 +6,7 @@ const API_ENDPOINT: &str = "https://api.stackexchange.com/2.3";
 
 // API filters to just include fields we need.
 const API_QUESTIONS_FILTER: &str =
-    "!FQztYWDEEX-i2dYDg4I)KgNAG4qe0OakrOyxz.zkYgTMDp0*6TplKxYPRxMk-4.(QtKd(sF-";
+    "EElmT9iE*eL20pftmjJrJa1RzdE9QOwek0yS*Tk9VsC59YEekmluvpWi71mN)yEJu00ci5W";
 // const API_SEARCH_FILTER: &str = "";
 
 // When it's not big enough some results might be missing.
@@ -26,25 +26,25 @@ pub struct User {
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct Comment {
-    body_markdown: Option<String>,
+    pub body_markdown: Option<String>,
     comment_id: Id,
     creation_date: Date,
     owner: User,
     post_id: Id,
-    score: i32,
+    pub score: i32,
 }
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct Answer {
     answer_id: Id,
-    body_markdown: String,
+    pub body_markdown: String,
     comment_count: u32,
-    comments: Option<Vec<Comment>>,
+    pub comments: Option<Vec<Comment>>,
     creation_date: Date,
     is_accepted: bool,
     last_activity_date: Date,
     owner: User,
-    score: i32,
+    pub score: i32,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -54,16 +54,16 @@ pub struct Question {
     pub body_markdown: String,
     pub comment_count: u32,
     pub comments: Option<Vec<Comment>>,
-    pub creation_date: Date,
+    creation_date: Date,
     pub is_answered: bool,
-    pub last_activity_date: Date,
-    pub link: String, // Url
-    pub owner: User,
-    pub question_id: Id,
+    last_activity_date: Date,
+    link: String, // Url
+    owner: User,
+    question_id: Id,
     pub score: i32,
-    pub tags: Vec<String>,
+    tags: Vec<String>,
     pub title: String,
-    pub view_count: u32,
+    view_count: u32,
 }
 
 pub struct StackExchange {

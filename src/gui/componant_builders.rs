@@ -10,6 +10,7 @@ pub fn st_question(question: &Question) -> gtk::Box {
     main_layout.append(
         &gtk::Label::builder()
             .selectable(true)
+            .can_focus(false)
             .label(&question.title)
             .css_classes(["title-1"])
             .wrap(true)
@@ -63,7 +64,7 @@ pub fn st_question(question: &Question) -> gtk::Box {
 
     question_sidebar_layout.append(
         &gtk::Label::builder()
-            .label(&question.score.to_string())
+            .label(question.score.to_string())
             .margin_top(10)
             .margin_bottom(10)
             .margin_start(10)
@@ -80,13 +81,149 @@ pub fn st_question(question: &Question) -> gtk::Box {
 
     question_layout.append(&md2gtk(&question.body_markdown));
 
+    match &question.comments {
+        Some(comments) => {
+            main_layout.append(
+                &gtk::Label::builder()
+                    // FIX: Use plural form for `Comments`.
+                    .label(format!("{} Comments", question.comment_count))
+                    .css_classes(["heading"])
+                    .halign(gtk::Align::Start)
+                    .build(),
+            );
+            for comment in comments {
+                main_layout.append(&st_comment(comment));
+            }
+        }
+        None => {}
+    }
+
+    main_layout.append(&gtk::Separator::new(gtk::Orientation::Horizontal));
+
+    match &question.answers {
+        Some(answers) => {
+            main_layout.append(
+                &gtk::Label::builder()
+                    // FIX: Use plural form for `Answers`.
+                    .label(format!("{} Answers", question.answer_count))
+                    .css_classes(["title-1"])
+                    .margin_start(5)
+                    .margin_end(5)
+                    .margin_top(15)
+                    .margin_bottom(10)
+                    .halign(gtk::Align::Start)
+                    .build(),
+            );
+
+            for answer in answers {
+                main_layout.append(&st_answer(answer));
+            }
+        }
+        None => {}
+    }
+
     main_layout
 }
 
-fn st_answer(answer: &Answer) {
-    todo!("Answer")
+fn st_answer(answer: &Answer) -> gtk::Frame {
+    // Answer main area
+    let answer_area_layout = gtk::Box::builder()
+        .orientation(gtk::Orientation::Vertical)
+        .build();
+
+    // Answer Body
+    let answer_layout = gtk::Box::builder()
+        .orientation(gtk::Orientation::Horizontal)
+        .build();
+    answer_area_layout.append(&answer_layout);
+
+    // Answer sidebar
+    let answer_sidebar_layout = gtk::Box::builder()
+        .orientation(gtk::Orientation::Vertical)
+        .build();
+    answer_layout.append(&answer_sidebar_layout);
+
+    answer_sidebar_layout.append(
+        &gtk::Label::builder()
+            .label(answer.score.to_string())
+            .margin_top(10)
+            .margin_bottom(10)
+            .margin_start(10)
+            .margin_end(10)
+            .css_classes(if answer.score >= 0 {
+                ["success"]
+            } else {
+                ["error"]
+            })
+            .build(),
+    );
+
+    answer_layout.append(&gtk::Separator::new(gtk::Orientation::Vertical));
+
+    answer_layout.append(&md2gtk(&answer.body_markdown));
+
+    match &answer.comments {
+        Some(comments) => {
+            for comment in comments {
+                answer_area_layout.append(&st_comment(comment));
+            }
+        }
+        None => {}
+    }
+
+    gtk::Frame::builder()
+        .child(&answer_area_layout)
+        .margin_top(15)
+        .margin_bottom(5)
+        .margin_start(5)
+        .margin_end(15)
+        .build()
 }
 
-fn st_comment(comment: &Comment) {
-    todo!("Comment")
+fn st_comment(comment: &Comment) -> gtk::Frame {
+    // Comment Body
+    let comment_layout = gtk::Box::builder()
+        .orientation(gtk::Orientation::Horizontal)
+        .build();
+
+    // Comment sidebar
+    let comment_sidebar_layout = gtk::Box::builder()
+        .orientation(gtk::Orientation::Vertical)
+        .build();
+    comment_layout.append(&comment_sidebar_layout);
+
+    comment_sidebar_layout.append(
+        &gtk::Label::builder()
+            .label(comment.score.to_string())
+            .margin_top(10)
+            .margin_bottom(10)
+            .margin_start(10)
+            .margin_end(10)
+            .css_classes(if comment.score >= 0 {
+                ["success"]
+            } else {
+                ["error"]
+            })
+            .build(),
+    );
+
+    comment_layout.append(&gtk::Separator::new(gtk::Orientation::Vertical));
+
+    match &comment.body_markdown {
+        Some(body_markdown) => comment_layout.append(&md2gtk(body_markdown)),
+        None => comment_layout.append(
+            &gtk::Label::builder()
+                .label("No content")
+                .css_classes(["dim-label"])
+                .build(),
+        ),
+    };
+
+    gtk::Frame::builder()
+        .child(&comment_layout)
+        .margin_top(5)
+        .margin_bottom(5)
+        .margin_start(5)
+        .margin_end(5)
+        .build()
 }

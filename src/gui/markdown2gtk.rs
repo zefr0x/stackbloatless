@@ -5,7 +5,7 @@ fn md_paragraph2buf(text_view: &gtk::TextView, buf: &gtk::TextBuffer, nodes: &Ve
     for node in nodes {
         match node {
             mdast::Node::InlineCode(code) => {
-                buf.insert_with_tags_by_name(&mut buf.end_iter(), &code.value, &["inline_code"]);
+                buf.insert_with_tags_by_name(&mut buf.end_iter(), &code.value, &["INLINE_CODE"]);
             }
             mdast::Node::Text(text) => buf.insert(&mut buf.end_iter(), &text.value),
             mdast::Node::Strong(strong) => {
@@ -14,7 +14,7 @@ fn md_paragraph2buf(text_view: &gtk::TextView, buf: &gtk::TextBuffer, nodes: &Ve
                         mdast::Node::Text(text) => buf.insert_with_tags_by_name(
                             &mut buf.end_iter(),
                             &text.value,
-                            &["bold"],
+                            &["BOLD"],
                         ),
                         // FIX: Make other children bold also.
                         _ => md_paragraph2buf(text_view, buf, &vec![node.to_owned()]),
@@ -27,7 +27,7 @@ fn md_paragraph2buf(text_view: &gtk::TextView, buf: &gtk::TextBuffer, nodes: &Ve
                         mdast::Node::Text(text) => buf.insert_with_tags_by_name(
                             &mut buf.end_iter(),
                             &text.value,
-                            &["emphasis"],
+                            &["EMPHASIS"],
                         ),
                         // FIX: Make other children emphasis also.
                         _ => md_paragraph2buf(text_view, buf, &vec![node.to_owned()]),
@@ -113,6 +113,7 @@ pub fn md2gtk(markdown_text: &str) -> gtk::TextView {
     let text_view = gtk::TextView::builder()
         .wrap_mode(gtk::WrapMode::Word)
         .editable(false)
+        .cursor_visible(false)
         .css_classes(["body", "body_buffer"])
         .margin_top(10)
         .margin_start(10)
@@ -128,7 +129,10 @@ pub fn md2gtk(markdown_text: &str) -> gtk::TextView {
     for node in tree.children().unwrap() {
         match node {
             mdast::Node::BlockQuote(quote) => {
-                todo!("BlockQuote")
+                buf.insert(&mut buf.end_iter(), "\n");
+                // FIX: Change background to darker one, and make text less white.
+                buf.insert_with_tags_by_name(&mut buf.end_iter(), &node.to_string(), &[]);
+                buf.insert(&mut buf.end_iter(), "\n");
             }
             mdast::Node::List(list) => {
                 buf.insert(&mut buf.end_iter(), "\n\n");
@@ -136,8 +140,10 @@ pub fn md2gtk(markdown_text: &str) -> gtk::TextView {
                 buf.insert(&mut buf.end_iter(), "\n");
             }
             mdast::Node::Heading(header) => {
-                // FIX: Applay style to heading, and show children.
-                md_paragraph2buf(&text_view, &buf, node.children().unwrap());
+                buf.insert(&mut buf.end_iter(), "\n");
+                // FIX: Change heading font size depending in header's depth.
+                buf.insert_with_tags_by_name(&mut buf.end_iter(), &node.to_string(), &["HEADING1"]);
+                buf.insert(&mut buf.end_iter(), "\n");
             }
             mdast::Node::Table(table) => {
                 todo!("Table")
@@ -158,10 +164,15 @@ pub fn md2gtk(markdown_text: &str) -> gtk::TextView {
 
                 // TODO: Apply monospace font.
                 let code_text = gtk::Label::builder()
-                    .use_markup(true)
                     .label(&code.value)
-                    .hexpand(true)
                     .selectable(true)
+                    .can_focus(false)
+                    .wrap(true)
+                    .wrap_mode(gtk::pango::WrapMode::Word)
+                    .justify(gtk::Justification::Fill)
+                    .hexpand(true)
+                    // FIX: Size doesn't adapt to space avialable: https://bugzilla.gnome.org/show_bug.cgi?id=318276
+                    .width_request(800)
                     .build();
 
                 frame.set_child(Some(&code_text));
@@ -181,20 +192,37 @@ pub fn md2gtk(markdown_text: &str) -> gtk::TextView {
 fn load_text_tags(buf: &gtk::TextBuffer) {
     let tag_table = buf.tag_table();
 
-    tag_table.add(&gtk::TextTag::builder().name("bold").weight(700).build());
+    tag_table.add(
+        &gtk::TextTag::builder()
+            .name("HEADING1")
+            .size_points(30.0)
+            .build(),
+    );
+
+    tag_table.add(&gtk::TextTag::builder().name("BOLD").weight(700).build());
 
     tag_table.add(
         &gtk::TextTag::builder()
-            .name("emphasis")
+            .name("EMPHASIS")
             .underline(gtk::pango::Underline::Single)
             .build(),
     );
 
     tag_table.add(
         &gtk::TextTag::builder()
-            .name("inline_code")
+            .name("INLINE_CODE")
             .font("monospace")
             .background("#050505")
             .build(),
     );
+
+    // tag_table.add(
+    //     &gtk::TextTag::builder()
+    //         .name("CODE_BLOCK")
+    //         .font("monospace")
+    //         .background("#050505")
+    //         .paragraph_background("#050505")
+    //         .background_full_height(true)
+    //         .build(),
+    // );
 }
