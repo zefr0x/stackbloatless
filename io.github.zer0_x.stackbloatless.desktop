@@ -6,6 +6,7 @@ Comment=Clean and effective native GUI for StackExchange sites
 GenericName=StackExchange Interface
 Exec=stackbloatless %U
 MimeType=x-scheme-handler/stackexchange
+SingleMainWindow=true
 Icon=io.github.zer0_x.stackbloatless
 Terminal=false
 Categories=Development
