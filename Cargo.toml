@@ -17,10 +17,10 @@ strip = true
 
 [dependencies]
 relm4 = { version = "0.6.0-beta.1", features = ["libadwaita", "macros"] }
-reqwest = { version = "0.11.16", features = ["json", "gzip"] }
-serde = { version = "1.0.160", features = ["derive"] }
+reqwest = { version = "0.11.18", features = ["json", "gzip"] }
+serde = { version = "1.0.163", features = ["derive"] }
 serde_json = { version = "1.0.96" }
-markdown = "1.0.0-alpha.7"
+markdown = "1.0.0-alpha.9"
 shadow-rs = "0.21.0"
 
 [build-dependencies]
@@ -33,7 +33,7 @@ features = ["v1_3"]
 
 [dependencies.relm4-icons]
 package = "relm4-icons"
-version = "0.6.0-beta.6"
+version = "0.6.0-beta.7"
 features = [
     "menu-large",
     "loupe",
