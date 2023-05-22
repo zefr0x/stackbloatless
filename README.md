@@ -16,6 +16,11 @@ Blazingly fast, clean, and effective **native** [Linux](https://en.wikipedia.org
 - 🔎 Simple search engine support. `[TODO]`
 - 🚫 Microsoft Windows is not supported.
 
+## Requirements
+
+- [GTK4](https://www.gtk.org/)
+- [Adwaita](https://gitlab.gnome.org/GNOME/libadwaita/)
+
 ## Installation
 
 ### Download Binary From Github
