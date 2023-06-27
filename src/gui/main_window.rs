@@ -310,6 +310,18 @@ impl AsyncComponent for AppModel {
             AppInput::ShowAboutWindow => {
                 let developers: Vec<&str> = env!("CARGO_PKG_AUTHORS").split(':').collect();
 
+                let windowing_backend_name = match gtk::gdk::Display::default() {
+                    Some(display) => {
+                        match display.backend() {
+                            gtk::gdk::Backend::Wayland => "Wayland".to_owned(),
+                            gtk::gdk::Backend::X11 => "X11".to_owned(),
+                            // When unsupported windowing system is used: win32, macos, broadway.
+                            _ => "Unsupported".to_owned(),
+                        }
+                    }
+                    None => "Undetected".to_owned(),
+                };
+
                 let about_window = adw::AboutWindow::builder()
                     .application_name(APP_NAME)
                     .version(env!("CARGO_PKG_VERSION"))
@@ -337,7 +349,7 @@ impl AsyncComponent for AppModel {
                         Adwaita: {}.{}.{}\n\
                         Cairo: {}\n\
                         Pango: {}\n\
-                        Session Type: {}\n\
+                        GDK Windowing Backend: {}\n\
                         Session Desktop: {}\n\
                         Current Desktop: {}",
                         build::BUILD_OS,
@@ -356,9 +368,9 @@ impl AsyncComponent for AppModel {
                         adw::micro_version(),
                         gtk::cairo::version_string(),
                         gtk::pango::version_string(),
-                        std::env::var("XDG_SESSION_TYPE").unwrap_or("Undetected".to_string()),
-                        std::env::var("XDG_SESSION_DESKTOP").unwrap_or("Undetected".to_string()),
-                        std::env::var("XDG_CURRENT_DESKTOP").unwrap_or("Undetected".to_string()),
+                        windowing_backend_name,
+                        std::env::var("XDG_SESSION_DESKTOP").unwrap_or("Undetected".to_owned()),
+                        std::env::var("XDG_CURRENT_DESKTOP").unwrap_or("Undetected".to_owned()),
                     ))
                     .build();
 
