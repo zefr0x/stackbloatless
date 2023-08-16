@@ -37,4 +37,7 @@ version = "0.6.0"
 features = [
     "menu-large",
     "loupe",
+    "dock-right",
+    "library",
+    "history-undo"
     ]

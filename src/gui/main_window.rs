@@ -100,7 +100,7 @@ impl AsyncComponent for AppModel {
                 .forward(sender.input_sender().to_owned(), |msg| msg),
         );
 
-        let main_layout = gtk::Box::new(gtk::Orientation::Vertical, 5);
+        let main_layout = gtk::Box::new(gtk::Orientation::Vertical, 0);
 
         // Create header bar
         let title_widget = adw::WindowTitle::builder()
@@ -225,8 +225,10 @@ impl AsyncComponent for AppModel {
         main_layout.append(&tab_bar);
 
         // Create tab view
-        let tab_view = adw::TabView::builder().menu_model(&tab_menu).build();
-        main_layout.append(&tab_view);
+        let tab_view = adw::TabView::builder()
+            .menu_model(&tab_menu)
+            .margin_top(5)
+            .build();
 
         tab_bar.set_view(Some(&tab_view));
 
@@ -235,6 +237,58 @@ impl AsyncComponent for AppModel {
                 view.set_selected_page(page);
             }
         });
+
+        // Create side bar
+        let side_bar_layout = gtk::Box::new(gtk::Orientation::Vertical, 0);
+
+        let side_bar_view = adw::ViewStack::builder()
+            .css_classes(["background"])
+            .vexpand(true)
+            .build();
+
+        side_bar_layout.append(
+            &adw::ViewSwitcher::builder()
+                .stack(&side_bar_view)
+                .css_classes(["background"])
+                .policy(adw::ViewSwitcherPolicy::Wide)
+                .build(),
+        );
+
+        side_bar_layout.append(&side_bar_view);
+
+        // Side bar pages
+        // TODO: Implement bookmarks
+        side_bar_view.add_titled_with_icon(
+            &adw::StatusPage::builder()
+                .title("Bookmarks")
+                .child(&gtk::Label::new(Some("Placeholder")))
+                .icon_name(icon_name::LIBRARY)
+                .build(),
+            None,
+            "Bookmarks",
+            icon_name::LIBRARY,
+        );
+
+        // TODO: Implement history
+        side_bar_view.add_titled_with_icon(
+            &adw::StatusPage::builder()
+                .title("History")
+                .child(&gtk::Label::new(Some("Placeholder")))
+                .icon_name(icon_name::HISTORY_UNDO)
+                .build(),
+            None,
+            "History",
+            icon_name::HISTORY_UNDO,
+        );
+
+        // Create Flap for the sidebar and the tab view
+        let flap = adw::Flap::builder()
+            .content(&tab_view)
+            .flap(&side_bar_layout)
+            .reveal_flap(false)
+            .flap_position(gtk::PackType::End)
+            .build();
+        main_layout.append(&flap);
 
         // Create tab button in the header
         let tab_button = adw::TabButton::builder()
@@ -252,6 +306,23 @@ impl AsyncComponent for AppModel {
             .child(&main_layout)
             .build();
         root.set_content(Some(&tab_overview));
+
+        // Create side bar button in the header
+        let sidebar_toggle_button = gtk::ToggleButton::builder()
+            .icon_name(icon_name::DOCK_RIGHT)
+            .build();
+        header.pack_end(&sidebar_toggle_button);
+
+        sidebar_toggle_button.connect_clicked(gtk::glib::clone!(@strong flap => move |button| {
+            flap.set_reveal_flap(button.is_active());
+        }));
+
+        // When flap is revealed or hidden change button status.
+        flap.connect_reveal_flap_notify(
+            gtk::glib::clone!(@strong sidebar_toggle_button => move |flap| {
+                sidebar_toggle_button.set_active(flap.reveals_flap());
+            }),
+        );
 
         let widgets = AppWidgets {
             tab_view,
