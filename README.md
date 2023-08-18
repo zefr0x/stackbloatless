@@ -26,7 +26,7 @@ Blazingly fast, clean, and effective **native** [Linux](https://en.wikipedia.org
 ### Download Binary From Github
 For every new release a Github workflow will build a binary in Github servers and will upload it as a release asset in Github releases.
 
-You can find the latest Github release [here](https://github.com/zer0-x/stackbloatless/releases/latest) or the releases page [here](https://github.com/zer0-x/stackbloatless/releases).
+You can find the latest Github release [here](https://github.com/zefr0x/stackbloatless/releases/latest) or the releases page [here](https://github.com/zefr0x/stackbloatless/releases).
 
 ## Build
 
@@ -34,7 +34,7 @@ You can find the latest Github release [here](https://github.com/zer0-x/stackblo
 > You need to have [`cargo`](https://doc.rust-lang.org/cargo/) installed in you system.
 
 ```shell
-git clone https://github.com/zer0-x/stackbloatless.git
+git clone https://github.com/zefr0x/stackbloatless.git
 
 cd stackbloatless
 

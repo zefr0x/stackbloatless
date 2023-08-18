@@ -1,12 +1,12 @@
 [package]
 name = "stackbloatless"
 version = "0.1.0-alpha.0"
-authors = ["zer0-x"]
+authors = ["zefr0x"]
 edition = "2021"
 description = "A clean and effective interface for stackexchange sites"
 readme = "README.md"
-homepage = "https://github.com/zer0-x/stackbloatless"
-repository = "https://github.com/zer0-x/stackbloatless"
+homepage = "https://github.com/zefr0x/stackbloatless"
+repository = "https://github.com/zefr0x/stackbloatless"
 license = "GPL-3.0"
 build = "build.rs"
 

@@ -2,17 +2,17 @@
 <component type="desktop">
     <metadata_license>CC-BY-SA-4.0</metadata_license>
     <project_license>GPL-3.0-only</project_license>
-    <id>io.github.zer0_x.stackbloatless</id>
+    <id>io.github.zefr0x.stackbloatless</id>
     <name>StackBloatLess</name>
-    <summary>Native, clean ,and effective desktop GUI for StackExchange sites</summary>
+    <summary>Native, clean, and effective desktop GUI for StackExchange sites</summary>
     <description>
         <p>Blazingly fast, clean, and effective native GUI for StackExchange sites.</p>
     </description>
-    <developer_name>zer0-x</developer_name>
+    <developer_name>zefr0x</developer_name>
     <provides>
         <binary>stackbloatless</binary>
     </provides>
-    <launchable type="desktop-id">io.github.zer0_x.stackbloatless.desktop</launchable>
+    <launchable type="desktop-id">io.github.zefr0x.stackbloatless.desktop</launchable>
     <content_rating type="oars-1.0"></content_rating>
     <!-- TODO: -->
     <!-- <translation type="gettext" source_locale = "en_GB">stackbloatless</translation> -->
@@ -23,22 +23,22 @@
         <!-- TODO: -->
         <!-- <keyword></keyword> -->
     </keywords>
-    <icon type="remote" width="128" height="128">https://github.com/zer0-x/stackbloatless/raw/main/assets/io.github.zer0_x.stackbloatless.svg</icon>
+    <icon type="remote" width="128" height="128">https://github.com/zefr0x/stackbloatless/raw/main/assets/io.github.zefr0x.stackbloatless.svg</icon>
     <!-- TODO: -->
     <!-- <branding> -->
     <!--     <color type="primary" scheme_preference="light">#ffffff</color> -->
     <!--     <color type="primary" scheme_preference="dark">#000000</color> -->
     <!-- </branding> -->
-    <url type="homepage">https://github.com/zer0-x/stackbloatless</url>
-    <url type="help">https://github.com/zer0-x/stackbloatless</url>
-    <url type="bugtracker">https://github.com/zer0-x/stackbloatless/issues</url>
-    <url type="translate">https://github.com/zer0-x/stackbloatless/blob/main/CONTRIBUTING.md#translation</url>
-    <url type="vcs-browser">https://github.com/zer0-x/stackbloatless</url>
-    <url type="contribute">https://github.com/zer0-x/stackbloatless/blob/main/CONTRIBUTING.md</url>
+    <url type="homepage">https://github.com/zefr0x/stackbloatless</url>
+    <url type="help">https://github.com/zefr0x/stackbloatless</url>
+    <url type="bugtracker">https://github.com/zefr0x/stackbloatless/issues</url>
+    <url type="translate">https://github.com/zefr0x/stackbloatless/blob/main/CONTRIBUTING.md#translation</url>
+    <url type="vcs-browser">https://github.com/zefr0x/stackbloatless</url>
+    <url type="contribute">https://github.com/zefr0x/stackbloatless/blob/main/CONTRIBUTING.md</url>
     <releases>
         <!-- TODO: -->
         <!-- <release version="0.1.0" date="2022-xx-xx" urgency="low"> -->
-        <!--     <url>https://github.com/zer0-x/stackbloatless/blob/main/CHANGELOG.md#010</url> -->
+        <!--     <url>https://github.com/zefr0x/stackbloatless/blob/main/CHANGELOG.md#010</url> -->
         <!-- </release> -->
     </releases>
     <!-- TODO: -->

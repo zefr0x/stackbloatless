@@ -4,7 +4,7 @@ use relm4::gtk;
 mod api;
 mod gui;
 
-const APP_ID: &str = "io.github.zer0_x.stackbloatless";
+const APP_ID: &str = "io.github.zefr0x.stackbloatless";
 
 fn main() {
     let base_app = adw::Application::builder()

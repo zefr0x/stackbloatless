@@ -400,7 +400,7 @@ impl AsyncComponent for AppModel {
                     .comments(env!("CARGO_PKG_DESCRIPTION"))
                     .developers(developers)
                     .website(env!("CARGO_PKG_HOMEPAGE"))
-                    .issue_url("https://github.com/zer0-x/stackbloatless/issues")
+                    .issue_url("https://github.com/zefr0x/stackbloatless/issues")
                     .application(&relm4::main_application())
                     .transient_for(&relm4::main_application().active_window().unwrap())
                     .debug_info(format!(
@@ -447,7 +447,7 @@ impl AsyncComponent for AppModel {
 
                 about_window.add_link(
                     "Release Notes",
-                    "https://github.com/zer0-x/stackbloatless/blob/main/CHANGELOG.md",
+                    "https://github.com/zefr0x/stackbloatless/blob/main/CHANGELOG.md",
                 );
 
                 about_window.present();
