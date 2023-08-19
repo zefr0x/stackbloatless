@@ -25,6 +25,7 @@ pub enum AppInput {
     RequestPagesByUri(stackexchange::Uri),
     ToggleSearchEntry,
     ShowAboutWindow,
+    ToggleSideBar,
     Quit,
     ToggleSelectedTabPin,
     CloseTab,
@@ -44,6 +45,7 @@ pub struct AppWidgets {
     header: adw::HeaderBar,
     search_button: gtk::ToggleButton,
     search_entry: gtk::SearchEntry,
+    sidebar_toggle_button: gtk::ToggleButton,
     title_widget: adw::WindowTitle,
 }
 
@@ -119,6 +121,7 @@ impl AsyncComponent for AppModel {
         // TODO: Create action to show GtkShortcutsWindow.
         relm4::new_action_group!(MenuActionGroup, "menu");
         relm4::new_stateless_action!(AboutAction, MenuActionGroup, "about");
+        relm4::new_stateless_action!(ToggleSideBarAction, MenuActionGroup, "toggle_sidebar");
         relm4::new_stateless_action!(QuitAction, MenuActionGroup, "quit");
         {
             let mut group = relm4::actions::RelmActionGroup::<MenuActionGroup>::new();
@@ -130,6 +133,14 @@ impl AsyncComponent for AppModel {
                     }),
                 );
             group.add_action(about_action);
+
+            let toggle_sidebar_action: relm4::actions::RelmAction<ToggleSideBarAction> =
+                relm4::actions::RelmAction::new_stateless(
+                    gtk::glib::clone!(@strong sender => move |_| {
+                        sender.input(AppInput::ToggleSideBar);
+                    }),
+                );
+            group.add_action(toggle_sidebar_action);
 
             let quit_action: relm4::actions::RelmAction<QuitAction> =
                 relm4::actions::RelmAction::new_stateless(
@@ -149,6 +160,7 @@ impl AsyncComponent for AppModel {
             }
         }
 
+        relm4::main_application().set_accelerators_for_action::<ToggleSideBarAction>(&["F9"]);
         relm4::main_application().set_accelerators_for_action::<QuitAction>(&["<Control>q"]);
 
         // Create hamburger menu
@@ -329,6 +341,7 @@ impl AsyncComponent for AppModel {
             header,
             search_button,
             search_entry,
+            sidebar_toggle_button,
             title_widget,
         };
 
@@ -451,6 +464,9 @@ impl AsyncComponent for AppModel {
                 );
 
                 about_window.present();
+            }
+            AppInput::ToggleSideBar => {
+                widgets.sidebar_toggle_button.emit_clicked();
             }
             AppInput::Quit => {
                 relm4::main_application().quit();
