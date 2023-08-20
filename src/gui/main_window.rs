@@ -2,7 +2,10 @@ use adw::prelude::*;
 use relm4::{
     actions::AccelsPlus,
     adw::traits::AdwWindowExt,
-    component::{AsyncComponent, AsyncComponentParts, AsyncComponentSender},
+    component::{
+        AsyncComponent, AsyncComponentController, AsyncComponentParts, AsyncComponentSender,
+        AsyncController,
+    },
     gtk::{
         prelude::ApplicationExt,
         traits::{GtkApplicationExt, WidgetExt},
@@ -13,6 +16,7 @@ use relm4::{
 use relm4_icons::icon_name;
 
 use super::componant_builders;
+use super::side_bar;
 use crate::api::stackexchange;
 
 const APP_NAME: &str = "StackBloatLess";
@@ -38,6 +42,7 @@ pub struct AppInit {
 
 pub struct AppModel {
     stackexchange_client: stackexchange::StackExchange,
+    side_bar_controller: AsyncController<side_bar::SideBarModel>,
 }
 
 pub struct AppWidgets {
@@ -80,6 +85,9 @@ impl AsyncComponent for AppModel {
     ) -> AsyncComponentParts<Self> {
         let model = AppModel {
             stackexchange_client: stackexchange::StackExchange::new(),
+            side_bar_controller: side_bar::SideBarModel::builder()
+                .launch(())
+                .forward(sender.input_sender(), |message| unreachable!()),
         };
 
         // Load CSS
@@ -251,52 +259,10 @@ impl AsyncComponent for AppModel {
         });
 
         // Create side bar
-        let side_bar_layout = gtk::Box::new(gtk::Orientation::Vertical, 0);
-
-        let side_bar_view = adw::ViewStack::builder()
-            .css_classes(["background"])
-            .vexpand(true)
-            .build();
-
-        side_bar_layout.append(
-            &adw::ViewSwitcher::builder()
-                .stack(&side_bar_view)
-                .css_classes(["background"])
-                .policy(adw::ViewSwitcherPolicy::Wide)
-                .build(),
-        );
-
-        side_bar_layout.append(&side_bar_view);
-
-        // Side bar pages
-        // TODO: Implement bookmarks
-        side_bar_view.add_titled_with_icon(
-            &adw::StatusPage::builder()
-                .title("Bookmarks")
-                .child(&gtk::Label::new(Some("Placeholder")))
-                .icon_name(icon_name::LIBRARY)
-                .build(),
-            None,
-            "Bookmarks",
-            icon_name::LIBRARY,
-        );
-
-        // TODO: Implement history
-        side_bar_view.add_titled_with_icon(
-            &adw::StatusPage::builder()
-                .title("History")
-                .child(&gtk::Label::new(Some("Placeholder")))
-                .icon_name(icon_name::HISTORY_UNDO)
-                .build(),
-            None,
-            "History",
-            icon_name::HISTORY_UNDO,
-        );
-
         // Create Flap for the sidebar and the tab view
         let flap = adw::Flap::builder()
             .content(&tab_view)
-            .flap(&side_bar_layout)
+            .flap(model.side_bar_controller.widget())
             .reveal_flap(false)
             .flap_position(gtk::PackType::End)
             .build();
