@@ -4,7 +4,7 @@ use relm4::{
     adw::traits::AdwWindowExt,
     component::{
         AsyncComponent, AsyncComponentController, AsyncComponentParts, AsyncComponentSender,
-        AsyncController,
+        AsyncController, Connector,
     },
     gtk::{
         prelude::ApplicationExt,
@@ -15,14 +15,15 @@ use relm4::{
 };
 use relm4_icons::icon_name;
 
+use super::about_dialog::{AboutWindow, AboutWindowInput};
 use super::componant_builders;
 use super::side_bar;
 use crate::api::stackexchange;
 
-const APP_NAME: &str = "StackBloatLess";
-
 // Save build-time informations
-shadow_rs::shadow!(build);
+shadow_rs::shadow!(build_time);
+
+pub const APP_NAME: &str = "StackBloatLess";
 
 #[derive(Debug, Clone)]
 pub enum AppInput {
@@ -43,6 +44,7 @@ pub struct AppInit {
 pub struct AppModel {
     stackexchange_client: stackexchange::StackExchange,
     side_bar_controller: AsyncController<side_bar::SideBarModel>,
+    about_window_connector: Connector<AboutWindow>,
 }
 
 pub struct AppWidgets {
@@ -87,7 +89,9 @@ impl AsyncComponent for AppModel {
             stackexchange_client: stackexchange::StackExchange::new(),
             side_bar_controller: side_bar::SideBarModel::builder()
                 .launch(())
-                .forward(sender.input_sender(), |message| unreachable!()),
+                .forward(sender.input_sender(), |_message| unreachable!()),
+            about_window_connector: AboutWindow::builder()
+                .launch(relm4::main_application().active_window().unwrap()),
         };
 
         // Load CSS
@@ -358,78 +362,10 @@ impl AsyncComponent for AppModel {
                 }
             }
             AppInput::ShowAboutWindow => {
-                let developers: Vec<&str> = env!("CARGO_PKG_AUTHORS").split(':').collect();
-
-                let windowing_backend_name = match gtk::gdk::Display::default() {
-                    Some(display) => {
-                        match display.backend() {
-                            gtk::gdk::Backend::Wayland => "Wayland".to_owned(),
-                            gtk::gdk::Backend::X11 => "X11".to_owned(),
-                            // When unsupported windowing system is used: win32, macos, broadway.
-                            _ => "Unsupported".to_owned(),
-                        }
-                    }
-                    None => "Undetected".to_owned(),
-                };
-
-                let about_window = adw::AboutWindow::builder()
-                    .application_name(APP_NAME)
-                    .version(env!("CARGO_PKG_VERSION"))
-                    .license_type(gtk::License::Gpl30Only)
-                    .comments(env!("CARGO_PKG_DESCRIPTION"))
-                    .developers(developers)
-                    .website(env!("CARGO_PKG_HOMEPAGE"))
-                    .issue_url("https://github.com/zefr0x/stackbloatless/issues")
-                    .application(&relm4::main_application())
-                    .transient_for(&relm4::main_application().active_window().unwrap())
-                    .debug_info(format!(
-                        "[rust]\n\
-                        {}\n\
-                        {}\n\
-                        {}\n\
-                        {}\n\n\
-                        [traget]\n\
-                        {}\n\n\
-                        [source]\n\
-                        branch: {}\n\
-                        commit: {}\n\
-                        clean: {}\n\n\
-                        [runtime]\n\
-                        GTK: {}.{}.{}\n\
-                        Adwaita: {}.{}.{}\n\
-                        Cairo: {}\n\
-                        Pango: {}\n\
-                        GDK Windowing Backend: {}\n\
-                        Session Desktop: {}\n\
-                        Current Desktop: {}",
-                        build::BUILD_OS,
-                        build::CARGO_VERSION,
-                        build::RUST_CHANNEL,
-                        build::RUST_VERSION,
-                        build::BUILD_TARGET,
-                        build::BRANCH,
-                        build::COMMIT_HASH,
-                        build::GIT_CLEAN,
-                        gtk::major_version(),
-                        gtk::minor_version(),
-                        gtk::micro_version(),
-                        adw::major_version(),
-                        adw::minor_version(),
-                        adw::micro_version(),
-                        gtk::cairo::version_string(),
-                        gtk::pango::version_string(),
-                        windowing_backend_name,
-                        std::env::var("XDG_SESSION_DESKTOP").unwrap_or("Undetected".to_owned()),
-                        std::env::var("XDG_CURRENT_DESKTOP").unwrap_or("Undetected".to_owned()),
-                    ))
-                    .build();
-
-                about_window.add_link(
-                    "Release Notes",
-                    "https://github.com/zefr0x/stackbloatless/blob/main/CHANGELOG.md",
-                );
-
-                about_window.present();
+                self.about_window_connector
+                    .sender()
+                    .send(AboutWindowInput::ShowWindow)
+                    .unwrap();
             }
             AppInput::ToggleSideBar => {
                 widgets.sidebar_toggle_button.emit_clicked();
