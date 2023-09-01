@@ -2,7 +2,9 @@
 # then it will build the binary and it will add it to the release assets
 # in a tar.gz archive along with other components.
 #
-# Reference: https://github.com/BurntSushi/ripgrep/blob/master/.github/workflows/release.yml
+# Reference:
+#   https://github.com/BurntSushi/ripgrep/blob/master/.github/workflows/release.yml
+#   https://github.com/rhino-linux/rhino-setup/blob/master/.github/workflows/package.yml
 
 name: release
 on:
@@ -53,19 +55,23 @@ jobs:
           toolchain: ${{ matrix.rust }}
           target: ${{ matrix.target }}
 
-      - name: Build Binary
-        run: cargo build --verbose --release
+      - name: Install System Deps
+        shell: bash
+        run: sudo apt install libadwaita-1-dev desktop-file-utils meson -y
 
-      - name: Build Archive
+      - name: Setup
+        run: meson build
+
+      - name: Build
+        run: meson install -C build --destdir "builds/${{ matrix.target }}"
+
+      - name: Create Archive
         shell: bash
         run: |
-          staging="stackbloatless-${{ needs.create-release.outputs.version }}-${{ matrix.target }}"
+          archive="stackbloatless-${{ needs.create-release.outputs.version }}-${{ matrix.target }}.tar.gz"
 
-          cp {README.md,LICENSE,CHANGELOG.md} "$staging/"
-          cp "target/release/stackbloatless" "$staging/"
-
-          tar czf "$staging.tar.gz" "$staging"
-          echo "ASSET=$staging.tar.gz" >> $GITHUB_ENV
+          tar -C "build/builds/" --create "${{ matrix.target }}/" --gzip --file "$archive"
+          echo "ASSET=$archive" >> $GITHUB_ENV
 
       - name: Upload Release Archive
         uses: actions/upload-release-asset@v1
