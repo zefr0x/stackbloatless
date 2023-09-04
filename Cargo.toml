@@ -39,5 +39,6 @@ features = [
     "loupe",
     "dock-right",
     "library",
-    "history-undo"
+    "history-undo",
+    "earth"
     ]

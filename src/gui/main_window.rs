@@ -262,7 +262,6 @@ impl AsyncComponent for AppModel {
             }
         });
 
-        // Create side bar
         // Create Flap for the sidebar and the tab view
         let flap = adw::Flap::builder()
             .content(&tab_view)

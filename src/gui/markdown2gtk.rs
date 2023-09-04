@@ -1,5 +1,8 @@
 use markdown::mdast;
 use relm4::prelude::gtk::{self, prelude::*};
+use relm4_icons::icon_name;
+
+// TODO: Refactor this mess if there is a better structure.
 
 fn md_paragraph2buf(text_view: &gtk::TextView, buf: &gtk::TextBuffer, nodes: &Vec<mdast::Node>) {
     for node in nodes {
@@ -35,20 +38,29 @@ fn md_paragraph2buf(text_view: &gtk::TextView, buf: &gtk::TextBuffer, nodes: &Ve
                 }
             }
             mdast::Node::Link(link) => {
+                // Show icon along side the hyperlink
                 let anchor = gtk::TextChildAnchor::new();
-
                 buf.insert_child_anchor(&mut buf.end_iter(), &anchor);
 
-                // TODO: Overwrite opener to open stackexchange link inside the app.
-                // FIX: Improve style.
-
-                let link_button = gtk::LinkButton::builder()
-                    // FIX: Show its children.
-                    .label("{LINK HOLDER}")
-                    .uri(&link.url)
+                let icon = gtk::Image::builder()
+                    .icon_name(icon_name::EARTH)
+                    .margin_end(3)
+                    .tooltip_text(&link.url)
                     .build();
 
-                text_view.add_child_at_anchor(&link_button, &anchor);
+                text_view.add_child_at_anchor(&icon, &anchor);
+
+                // Create a link tag.
+                let tag = gtk::TextTag::builder()
+                    .foreground("#90c2ff")
+                    .underline(gtk::pango::Underline::Single)
+                    .build();
+                // TODO: Save and asociate URI with the tag.
+                // TODO: Asociate a click event to this tag to open the URI.
+                // TODO: Open stackexchange links inside the app.
+                buf.tag_table().add(&tag);
+
+                buf.insert_with_tags(&mut buf.end_iter(), &node.to_string(), &[&tag]);
             }
             mdast::Node::LinkReference(link_ref) => {
                 todo!("LinkRefrence")
@@ -128,10 +140,13 @@ pub fn md2gtk(markdown_text: &str) -> gtk::TextView {
 
     for node in tree.children().unwrap() {
         match node {
-            mdast::Node::BlockQuote(quote) => {
+            mdast::Node::BlockQuote(_quote) => {
                 buf.insert(&mut buf.end_iter(), "\n");
-                // FIX: Change background to darker one, and make text less white.
-                buf.insert_with_tags_by_name(&mut buf.end_iter(), &node.to_string(), &[]);
+                buf.insert_with_tags_by_name(
+                    &mut buf.end_iter(),
+                    &node.to_string(),
+                    &["BLOCK_QUOTE"],
+                );
                 buf.insert(&mut buf.end_iter(), "\n");
             }
             mdast::Node::List(list) => {
@@ -141,8 +156,24 @@ pub fn md2gtk(markdown_text: &str) -> gtk::TextView {
             }
             mdast::Node::Heading(header) => {
                 buf.insert(&mut buf.end_iter(), "\n");
-                // FIX: Change heading font size depending in header's depth.
-                buf.insert_with_tags_by_name(&mut buf.end_iter(), &node.to_string(), &["HEADING1"]);
+
+                buf.insert_with_tags_by_name(
+                    &mut buf.end_iter(),
+                    &node.to_string(),
+                    &[
+                        "BOLD",
+                        match header.depth {
+                            1 => "HEADING1",
+                            2 => "HEADING2",
+                            3 => "HEADING3",
+                            4 => "HEADING4",
+                            5 => "HEADING5",
+                            6 => "HEADING6",
+                            _ => unreachable!(),
+                        },
+                    ],
+                );
+
                 buf.insert(&mut buf.end_iter(), "\n");
             }
             mdast::Node::Table(table) => {
@@ -156,32 +187,13 @@ pub fn md2gtk(markdown_text: &str) -> gtk::TextView {
                 // let meta = code.meta.clone();
                 buf.insert(&mut buf.end_iter(), "\n\n");
 
-                let anchor = gtk::TextChildAnchor::new();
-
-                buf.insert_child_anchor(&mut buf.end_iter(), &anchor);
-
-                let frame = gtk::Frame::builder().hexpand(true).build();
-
-                // TODO: Apply monospace font.
-                let code_text = gtk::Label::builder()
-                    .label(&code.value)
-                    .selectable(true)
-                    .can_focus(false)
-                    .wrap(true)
-                    .wrap_mode(gtk::pango::WrapMode::Word)
-                    .justify(gtk::Justification::Fill)
-                    .hexpand(true)
-                    // FIX: Size doesn't adapt to space avialable: https://bugzilla.gnome.org/show_bug.cgi?id=318276
-                    .width_request(800)
-                    .build();
-
-                frame.set_child(Some(&code_text));
-
-                text_view.add_child_at_anchor(&frame, &anchor);
+                buf.insert_with_tags_by_name(&mut buf.end_iter(), &code.value, &["CODE_BLOCK"]);
 
                 buf.insert(&mut buf.end_iter(), "\n\n");
             }
-            mdast::Node::Html(html) => {}
+            mdast::Node::Html(html) => {
+                unimplemented!("HTML parsing")
+            }
             _ => dbg!(),
         }
     }
@@ -192,10 +204,41 @@ pub fn md2gtk(markdown_text: &str) -> gtk::TextView {
 fn load_text_tags(buf: &gtk::TextBuffer) {
     let tag_table = buf.tag_table();
 
+    // Heading stylies
     tag_table.add(
         &gtk::TextTag::builder()
             .name("HEADING1")
             .size_points(30.0)
+            .build(),
+    );
+    tag_table.add(
+        &gtk::TextTag::builder()
+            .name("HEADING2")
+            .size_points(28.0)
+            .build(),
+    );
+    tag_table.add(
+        &gtk::TextTag::builder()
+            .name("HEADING3")
+            .size_points(26.0)
+            .build(),
+    );
+    tag_table.add(
+        &gtk::TextTag::builder()
+            .name("HEADING4")
+            .size_points(24.0)
+            .build(),
+    );
+    tag_table.add(
+        &gtk::TextTag::builder()
+            .name("HEADING5")
+            .size_points(22.0)
+            .build(),
+    );
+    tag_table.add(
+        &gtk::TextTag::builder()
+            .name("HEADING6")
+            .size_points(20.0)
             .build(),
     );
 
@@ -210,19 +253,37 @@ fn load_text_tags(buf: &gtk::TextBuffer) {
 
     tag_table.add(
         &gtk::TextTag::builder()
+            .name("BLOCK_QUOTE")
+            .background("#050505")
+            .paragraph_background("#050505")
+            .foreground("#696969")
+            .left_margin(20)
+            .indent(10)
+            .pixels_below_lines(10)
+            .pixels_above_lines(10)
+            .style(gtk::pango::Style::Oblique)
+            .build(),
+    );
+
+    tag_table.add(
+        &gtk::TextTag::builder()
             .name("INLINE_CODE")
             .font("monospace")
             .background("#050505")
             .build(),
     );
 
-    // tag_table.add(
-    //     &gtk::TextTag::builder()
-    //         .name("CODE_BLOCK")
-    //         .font("monospace")
-    //         .background("#050505")
-    //         .paragraph_background("#050505")
-    //         .background_full_height(true)
-    //         .build(),
-    // );
+    // FIX: When a line has no text, background color will not be applied.
+    tag_table.add(
+        &gtk::TextTag::builder()
+            .name("CODE_BLOCK")
+            .font("monospace")
+            .background("#050505")
+            .paragraph_background("#050505")
+            .background_full_height(true)
+            .indent(10)
+            .pixels_below_lines(10)
+            .pixels_above_lines(10)
+            .build(),
+    );
 }
