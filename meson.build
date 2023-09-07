@@ -41,7 +41,8 @@ install_data(
 gnome.post_install(
   gtk_update_icon_cache: true,
   update_desktop_database: true,
-  update_mime_database: true,
+  # TODO: Enable it when ubuntu latest LTS's meson supports it.
+  # update_mime_database: true,
 )
 
 # Build summaries
