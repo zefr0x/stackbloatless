@@ -2,7 +2,21 @@
 
 <h1>StackBloatLess</h1>
 
-Blazingly fast, clean, and effective **native** [Linux](https://en.wikipedia.org/wiki/Linux) desktop GUI for **StackExchange** sites.
+[![release](https://github.com/zefr0x/stackbloatless/actions/workflows/release.yml/badge.svg)](https://github.com/zefr0x/stackbloatless/actions/workflows/release.yml)
+
+Blazingly fast, clean, and effective **native** [Linux](https://en.wikipedia.org/wiki/Linux) desktop [GUI](https://en.wikipedia.org/wiki/Graphical_user_interface) for [**StackExchange**](https://en.wikipedia.org/wiki/Stack_Exchange_Network) sites.
+
+
+---
+
+[<kbd><br><b>Install</b><br><br></kbd>](#installation)
+[<kbd><br><b>Screenshots</b><br><br></kbd>](#screenshots)
+[<kbd><br><b>Contribute</b><br><br></kbd>](CONTRIBUTING.md)
+[<kbd><br><b>Packaging</b><br><br></kbd>](PACKAGING.md)
+
+---
+
+<br>
 
 </div>
 
@@ -57,6 +71,10 @@ StackBloatLess accept StackExchange questions in the next format to be opened in
 stackexchange://{api_site_parameter}/{ids}
 ```
 Where `{api_site_parameter}` is specific to single StackExchange site that could be found [here](https://api.stackexchange.com/docs/sites#pagesize=500&filter=!SldCuNUOz*uwhNyRzh&run=true), and `{ids}` is a list of questions ids seprated by `;`, like `id;id;id;id...`.
+
+## Screenshots
+
+<!-- TODO: Add images. -->
 
 ## Inspired by
 
