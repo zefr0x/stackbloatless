@@ -194,6 +194,8 @@ impl AsyncComponent for AppModel {
 
         header.pack_start(&search_button);
 
+        // TODO: Use the search entry for searching inside a page.
+        // TODO: Use the new tab page as a search page.
         let search_entry = gtk::SearchEntry::builder()
             // TODO: Make icon clickable to select a stackexchange site to search in.
             .placeholder_text("Enter a search term or question id")

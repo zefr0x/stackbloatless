@@ -84,19 +84,19 @@ fn md_list2buf(
     buf: &gtk::TextBuffer,
     list: &mdast::List,
     indent_level: u8,
-) -> gtk::Box {
-    let layout = gtk::Box::builder()
-        .orientation(gtk::Orientation::Vertical)
+) {
+    let tag = gtk::TextTag::builder()
+        .indent(20 * indent_level as i32)
+        .style(gtk::pango::Style::Italic)
+        .scale(1.3)
         .build();
+    buf.tag_table().add(&tag);
 
     for (num, node) in list.children.iter().enumerate() {
-        for _ in 0..indent_level {
-            buf.insert(&mut buf.end_iter(), "\t");
-        }
         if list.ordered {
-            buf.insert(&mut buf.end_iter(), &format!(" {}", num));
+            buf.insert_with_tags(&mut buf.end_iter(), &format!("{}. ", num + 1), &[&tag])
         } else {
-            buf.insert(&mut buf.end_iter(), "• ")
+            buf.insert_with_tags(&mut buf.end_iter(), "• ", &[&tag])
         }
 
         match node {
@@ -111,8 +111,6 @@ fn md_list2buf(
 
         buf.insert(&mut buf.end_iter(), "\n");
     }
-
-    layout
 }
 
 pub fn md2gtk(markdown_text: &str) -> gtk::TextView {
@@ -201,6 +199,7 @@ pub fn md2gtk(markdown_text: &str) -> gtk::TextView {
     text_view
 }
 
+// Loading constant tags
 fn load_text_tags(buf: &gtk::TextBuffer) {
     let tag_table = buf.tag_table();
 
