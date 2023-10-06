@@ -1,4 +1,4 @@
-use relm4::prelude::gtk::{self, prelude::*};
+use relm4::gtk::{self, prelude::*};
 
 use super::markdown2gtk::md2gtk;
 use crate::api::stackexchange::{Answer, Comment, Question, User};
