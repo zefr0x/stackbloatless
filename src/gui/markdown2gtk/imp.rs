@@ -6,6 +6,12 @@ use super::cell_object::CellObject;
 
 // TODO: Refactor this mess if there is a better structure.
 
+struct TagsColorScheme {
+    code_background: String,
+    quote_background: String,
+    quote_foreground: String,
+}
+
 fn md_paragraph2buf(text_view: &gtk::TextView, buf: &gtk::TextBuffer, nodes: &Vec<mdast::Node>) {
     for node in nodes {
         match node {
@@ -298,6 +304,26 @@ pub fn md2gtk(markdown_text: &str) -> gtk::TextView {
 
 // Loading constant tags
 fn load_text_tags(buf: &gtk::TextBuffer) {
+    let style_manager = adw::StyleManager::default();
+
+    // FIX: Reload tags dynamicly when the system theme is changed.
+    let color_scheme = if style_manager.is_dark() {
+        // Dark mode colors
+        TagsColorScheme {
+            code_background: "#050505".to_owned(),
+            quote_background: "#050505".to_owned(),
+            quote_foreground: "#696969".to_owned(),
+        }
+    } else {
+        // Light mode colors
+        TagsColorScheme {
+            code_background: "#b0b0b0".to_owned(),
+            quote_background: "#505050".to_owned(),
+            quote_foreground: "#ffffff".to_owned(),
+        }
+    };
+
+    // Get the buffer's tags table.
     let tag_table = buf.tag_table();
 
     // Heading stylies
@@ -350,9 +376,9 @@ fn load_text_tags(buf: &gtk::TextBuffer) {
     tag_table.add(
         &gtk::TextTag::builder()
             .name("BLOCK_QUOTE")
-            .background("#050505")
-            .paragraph_background("#050505")
-            .foreground("#696969")
+            .background(&color_scheme.quote_background)
+            .paragraph_background(&color_scheme.quote_background)
+            .foreground(&color_scheme.quote_foreground)
             .left_margin(20)
             .indent(10)
             .pixels_below_lines(10)
@@ -365,7 +391,7 @@ fn load_text_tags(buf: &gtk::TextBuffer) {
         &gtk::TextTag::builder()
             .name("INLINE_CODE")
             .font("monospace")
-            .background("#050505")
+            .background(&color_scheme.code_background)
             .build(),
     );
 
@@ -374,8 +400,8 @@ fn load_text_tags(buf: &gtk::TextBuffer) {
         &gtk::TextTag::builder()
             .name("CODE_BLOCK")
             .font("monospace")
-            .background("#050505")
-            .paragraph_background("#050505")
+            .background(&color_scheme.code_background)
+            .paragraph_background(&color_scheme.code_background)
             .background_full_height(true)
             .indent(10)
             .pixels_below_lines(10)
