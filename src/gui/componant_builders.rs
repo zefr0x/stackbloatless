@@ -1,6 +1,8 @@
 use relm4::gtk::{self, prelude::*};
 
-use super::markdown2gtk::md2gtk;
+use std::str::FromStr;
+
+use super::markdown2gtk::MarkdownView;
 use crate::api::stackexchange::{Answer, Comment, Question, User};
 
 pub fn st_question(question: &Question) -> gtk::Box {
@@ -79,7 +81,11 @@ pub fn st_question(question: &Question) -> gtk::Box {
 
     question_layout.append(&gtk::Separator::new(gtk::Orientation::Vertical));
 
-    question_layout.append(&md2gtk(&question.body_markdown));
+    {
+        let md_view = MarkdownView::from_str(&question.body_markdown).unwrap();
+
+        question_layout.append(&md_view.text_view);
+    }
 
     match &question.comments {
         Some(comments) => {
@@ -160,7 +166,11 @@ fn st_answer(answer: &Answer) -> gtk::Frame {
 
     answer_layout.append(&gtk::Separator::new(gtk::Orientation::Vertical));
 
-    answer_layout.append(&md2gtk(&answer.body_markdown));
+    {
+        let md_view = MarkdownView::from_str(&answer.body_markdown).unwrap();
+
+        answer_layout.append(&md_view.text_view);
+    }
 
     match &answer.comments {
         Some(comments) => {
@@ -210,7 +220,11 @@ fn st_comment(comment: &Comment) -> gtk::Frame {
     comment_layout.append(&gtk::Separator::new(gtk::Orientation::Vertical));
 
     match &comment.body_markdown {
-        Some(body_markdown) => comment_layout.append(&md2gtk(body_markdown)),
+        Some(body_markdown) => {
+            let md_view = MarkdownView::from_str(body_markdown).unwrap();
+
+            comment_layout.append(&md_view.text_view);
+        }
         None => comment_layout.append(
             &gtk::Label::builder()
                 .label("No content")
