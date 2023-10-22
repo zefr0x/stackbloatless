@@ -233,7 +233,8 @@ impl MarkdownView {
 
                     self.buf.insert(&mut self.buf.end_iter(), "\n\n");
                 }
-                mdast::Node::Html(html) => {
+                mdast::Node::Html(_html) => {
+                    // TODO: Convert simple HTML to GTK.
                     unimplemented!("HTML parsing")
                 }
                 _ => unimplemented!(),
@@ -305,13 +306,13 @@ impl MarkdownView {
                     self.buf
                         .insert_with_tags(&mut self.buf.end_iter(), &node.to_string(), &[&tag]);
                 }
-                mdast::Node::LinkReference(link_ref) => {
+                mdast::Node::LinkReference(_link_ref) => {
                     todo!("LinkRefrence")
                 }
-                mdast::Node::Image(image) => {
+                mdast::Node::Image(_image) => {
                     todo!("Image")
                 }
-                mdast::Node::ImageReference(image_ref) => {
+                mdast::Node::ImageReference(_image_ref) => {
                     todo!("ImageReference")
                 }
                 mdast::Node::Paragraph(paragraph) => {

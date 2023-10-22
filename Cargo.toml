@@ -9,7 +9,6 @@ homepage = "https://github.com/zefr0x/stackbloatless"
 repository = "https://github.com/zefr0x/stackbloatless"
 license = "GPL-3.0"
 build = "build.rs"
-
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [profile.release]
@@ -19,11 +18,13 @@ panic = "abort"
 strip = true
 
 [dependencies]
+icu = { version = "1.3.2", features = ["std"] }
+markdown = "1.0.0-alpha.13"
+once_cell = "1.18.0"
 relm4 = { version = "0.7.0-alpha.1", features = ["libadwaita", "macros"] }
 reqwest = { version = "0.11.20", features = ["json", "gzip"] }
 serde = { version = "1.0.188", features = ["derive"] }
 serde_json = { version = "1.0.106" }
-markdown = "1.0.0-alpha.13"
 shadow-rs = "0.23.0"
 
 [build-dependencies]

@@ -3,6 +3,7 @@ use relm4::gtk;
 
 mod api;
 mod gui;
+mod utils;
 
 const APP_ID: &str = "io.github.zefr0x.stackbloatless";
 

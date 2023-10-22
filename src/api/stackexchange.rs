@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use reqwest::Url;
 use serde::Deserialize;
 use serde_json as json;
@@ -16,34 +18,40 @@ pub type Id = u32; // Since all operations are in strings not integers.
 pub type Uri = String;
 type Date = i64;
 
+pub trait DateExt: Sized {
+    fn formate_date_time_string(self) -> String;
+
+    // TODO: Create another method to provide `before 2 years` like format.
+}
+
 #[derive(Debug, Clone, Deserialize)]
 pub struct User {
-    display_name: String,
-    link: Option<String>, // Url
-    reputation: Option<u32>,
-    user_id: Option<Id>,
+    pub display_name: String,
+    pub link: Option<String>, // Url
+    pub reputation: Option<u32>,
+    pub user_id: Option<Id>,
 }
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct Comment {
     pub body_markdown: Option<String>,
-    comment_id: Id,
-    creation_date: Date,
-    owner: User,
-    post_id: Id,
+    pub comment_id: Id,
+    pub creation_date: Date,
+    pub owner: User,
+    pub post_id: Id,
     pub score: i32,
 }
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct Answer {
-    answer_id: Id,
+    pub answer_id: Id,
     pub body_markdown: String,
-    comment_count: u32,
+    pub comment_count: u32,
     pub comments: Option<Vec<Comment>>,
-    creation_date: Date,
-    is_accepted: bool,
-    last_activity_date: Date,
-    owner: User,
+    pub creation_date: Date,
+    pub is_accepted: bool,
+    pub last_activity_date: Date,
+    pub owner: User,
     pub score: i32,
 }
 
@@ -54,16 +62,16 @@ pub struct Question {
     pub body_markdown: String,
     pub comment_count: u32,
     pub comments: Option<Vec<Comment>>,
-    creation_date: Date,
+    pub creation_date: Date,
     pub is_answered: bool,
-    last_activity_date: Date,
+    pub last_activity_date: Date,
     link: String, // Url
-    owner: User,
-    question_id: Id,
+    pub owner: User,
+    pub question_id: Id,
     pub score: i32,
     tags: Vec<String>,
     pub title: String,
-    view_count: u32,
+    pub view_count: u32,
 }
 
 pub struct StackExchange {
@@ -121,4 +129,29 @@ impl StackExchange {
     //     // Docs: https://api.stackexchange.com/docs/search
     //     todo!();
     // }
+}
+
+impl DateExt for Date {
+    fn formate_date_time_string(self) -> String {
+        use icu::calendar::DateTime;
+        use icu::datetime::DateTimeFormatter;
+        use icu::locid::Locale;
+
+        let locale = Locale::from_str(&crate::utils::SYSTEM_TIME_LOCALE)
+            .unwrap()
+            .into();
+
+        let calendar = icu::calendar::AnyCalendar::new_for_locale(&locale);
+
+        // PERF: Use static formatter and calendar to be initialized once.
+        let formatter = DateTimeFormatter::try_new(&locale, Default::default()).unwrap();
+
+        formatter
+            .format_to_string(
+                &DateTime::from_minutes_since_local_unix_epoch((self / 60) as i32)
+                    .to_any()
+                    .to_calendar(calendar),
+            )
+            .unwrap()
+    }
 }
