@@ -6,6 +6,7 @@ use super::markdown2gtk::MarkdownView;
 use crate::api::stackexchange::{Answer, Comment, DateExt, Question, User};
 
 // TODO: Restructure this part of code as a relm component.
+// TODO: Use grid layout for some cases.
 
 pub fn st_question(question: &Question) -> gtk::Box {
     let main_layout = gtk::Box::new(gtk::Orientation::Vertical, 0);
@@ -25,6 +26,7 @@ pub fn st_question(question: &Question) -> gtk::Box {
             .build(),
     );
 
+    // Header
     {
         // Question info bar
         let question_header = gtk::Box::builder()
@@ -91,45 +93,50 @@ pub fn st_question(question: &Question) -> gtk::Box {
         }
     }
 
-    // Separator between header and question body
+    // Separator between header and question
     main_layout.append(&gtk::Separator::new(gtk::Orientation::Horizontal));
 
-    // Question Body
+    // Question (sidebar and body)
     let question_layout = gtk::Box::builder()
         .orientation(gtk::Orientation::Horizontal)
         .build();
     main_layout.append(&question_layout);
 
     // Question sidebar
-    let question_sidebar_layout = gtk::Box::builder()
-        .orientation(gtk::Orientation::Vertical)
-        .tooltip_markup(format!("<b>Question ID:</b> {}", question.question_id))
-        .build();
-    question_layout.append(&question_sidebar_layout);
+    {
+        let question_sidebar_layout = gtk::Box::builder()
+            .orientation(gtk::Orientation::Vertical)
+            .tooltip_markup(format!("<b>Question ID:</b> {}", question.question_id))
+            .build();
+        question_layout.append(&question_sidebar_layout);
 
-    question_sidebar_layout.append(
-        &gtk::Label::builder()
-            .label(question.score.to_string())
-            .margin_top(10)
-            .margin_bottom(10)
-            .margin_start(10)
-            .margin_end(10)
-            .css_classes(if question.score >= 0 {
-                ["success"]
-            } else {
-                ["error"]
-            })
-            .build(),
-    );
+        question_sidebar_layout.append(
+            &gtk::Label::builder()
+                .label(question.score.to_string())
+                .margin_top(10)
+                .margin_bottom(10)
+                .margin_start(10)
+                .margin_end(10)
+                .css_classes(if question.score >= 0 {
+                    ["success"]
+                } else {
+                    ["error"]
+                })
+                .build(),
+        );
+    }
 
+    // Separator between sidebar and question body
     question_layout.append(&gtk::Separator::new(gtk::Orientation::Vertical));
 
+    // Body
     {
         let md_view = MarkdownView::from_str(&question.body_markdown).unwrap();
 
         question_layout.append(&md_view.text_view);
     }
 
+    // Comments
     match &question.comments {
         Some(comments) => {
             main_layout.append(
@@ -148,8 +155,10 @@ pub fn st_question(question: &Question) -> gtk::Box {
         None => {}
     }
 
+    // Separator between question area and answers
     main_layout.append(&gtk::Separator::new(gtk::Orientation::Horizontal));
 
+    // Answers
     match &question.answers {
         Some(answers) => {
             main_layout.append(
@@ -176,98 +185,102 @@ pub fn st_question(question: &Question) -> gtk::Box {
 }
 
 fn st_answer(answer: &Answer) -> gtk::Frame {
-    // Answer main area
+    // Main layout for answer area
     let main_layout = gtk::Box::builder()
         .orientation(gtk::Orientation::Vertical)
         .build();
 
-    // Answer Block
+    // Answer Header
+    {
+        let answer_header = gtk::Box::builder()
+            .orientation(gtk::Orientation::Horizontal)
+            .build();
+        main_layout.append(&answer_header);
+
+        if answer.is_accepted {
+            answer_header.append(
+                &gtk::Label::builder()
+                    .label("Accepted")
+                    .css_classes(["success", "heading"])
+                    .build(),
+            );
+        }
+
+        answer_header.append(
+            &gtk::Label::builder()
+                .use_markup(true)
+                .label(format!(
+                    "<b>Created:</b> {}",
+                    answer.creation_date.formate_date_time_string()
+                ))
+                .margin_start(20)
+                .build(),
+        );
+
+        answer_header.append(
+            &gtk::Label::builder()
+                .use_markup(true)
+                .label(format!(
+                    "<b>Last Active:</b> {}",
+                    answer.last_activity_date.formate_date_time_string()
+                ))
+                .margin_start(20)
+                .build(),
+        );
+
+        {
+            let owner_avatar = st_user(&answer.owner, true);
+            owner_avatar.set_halign(gtk::Align::End);
+            owner_avatar.set_hexpand(true);
+
+            answer_header.append(&owner_avatar);
+        }
+    }
+
+    // Separator between answer header and answer
+    main_layout.append(&gtk::Separator::new(gtk::Orientation::Horizontal));
+
+    // Answer Block (sidebar and body, without comments)
     let answer_layout = gtk::Box::builder()
         .orientation(gtk::Orientation::Horizontal)
         .build();
     main_layout.append(&answer_layout);
 
     // Answer sidebar
-    let answer_sidebar_layout = gtk::Box::builder()
-        .orientation(gtk::Orientation::Vertical)
-        .tooltip_markup(format!("<b>Answer ID:</b> {}", answer.answer_id))
-        .build();
-    answer_layout.append(&answer_sidebar_layout);
+    {
+        let answer_sidebar_layout = gtk::Box::builder()
+            .orientation(gtk::Orientation::Vertical)
+            .tooltip_markup(format!("<b>Answer ID:</b> {}", answer.answer_id))
+            .build();
+        answer_layout.append(&answer_sidebar_layout);
 
-    answer_sidebar_layout.append(
-        &gtk::Label::builder()
-            .label(answer.score.to_string())
-            .margin_top(10)
-            .margin_bottom(10)
-            .margin_start(10)
-            .margin_end(10)
-            .css_classes(if answer.score >= 0 {
-                ["success"]
-            } else {
-                ["error"]
-            })
-            .build(),
-    );
-
-    answer_layout.append(&gtk::Separator::new(gtk::Orientation::Vertical));
-
-    let answer_body = gtk::Box::builder()
-        .orientation(gtk::Orientation::Vertical)
-        .build();
-    answer_layout.append(&answer_body);
-
-    let answer_header = gtk::Box::builder()
-        .orientation(gtk::Orientation::Horizontal)
-        .build();
-    answer_body.append(&answer_header);
-
-    answer_body.append(&gtk::Separator::new(gtk::Orientation::Horizontal));
-
-    if answer.is_accepted {
-        answer_header.append(
+        answer_sidebar_layout.append(
             &gtk::Label::builder()
-                .label("Accepted")
-                .css_classes(["success", "heading"])
+                .label(answer.score.to_string())
+                .margin_top(10)
+                .margin_bottom(10)
+                .margin_start(10)
+                .margin_end(10)
+                .css_classes(if answer.score >= 0 {
+                    ["success"]
+                } else {
+                    ["error"]
+                })
                 .build(),
         );
     }
 
-    answer_header.append(
-        &gtk::Label::builder()
-            .use_markup(true)
-            .label(format!(
-                "<b>Created:</b> {}",
-                answer.creation_date.formate_date_time_string()
-            ))
-            .margin_start(20)
-            .build(),
-    );
+    // Separator between sidebar and body
+    answer_layout.append(&gtk::Separator::new(gtk::Orientation::Vertical));
 
-    answer_header.append(
-        &gtk::Label::builder()
-            .use_markup(true)
-            .label(format!(
-                "<b>Last Active:</b> {}",
-                answer.last_activity_date.formate_date_time_string()
-            ))
-            .margin_start(20)
-            .build(),
-    );
-
-    {
-        let owner_avatar = st_user(&answer.owner, true);
-        owner_avatar.set_halign(gtk::Align::End);
-        owner_avatar.set_hexpand(true);
-
-        answer_header.append(&owner_avatar);
-    }
-
+    // Body
     {
         let md_view = MarkdownView::from_str(&answer.body_markdown).unwrap();
 
-        answer_body.append(&md_view.text_view);
+        answer_layout.append(&md_view.text_view);
     }
 
+    // Comments
     match &answer.comments {
         Some(comments) => {
             main_layout.append(
@@ -295,78 +308,83 @@ fn st_answer(answer: &Answer) -> gtk::Frame {
 }
 
 fn st_comment(comment: &Comment) -> gtk::Frame {
-    // Comment Body
-    let comment_layout = gtk::Box::builder()
+    let main_layout = gtk::Box::builder()
         .orientation(gtk::Orientation::Horizontal)
         .build();
 
     // Comment sidebar
-    let comment_sidebar_layout = gtk::Box::builder()
-        .orientation(gtk::Orientation::Vertical)
-        .tooltip_markup(format!(
-            "<b>Comment ID:</b> {}\n<b>Post ID:</b> {}",
-            comment.comment_id, comment.post_id
-        ))
-        .build();
-    comment_layout.append(&comment_sidebar_layout);
+    {
+        let sidebar_layout = gtk::Box::builder()
+            .orientation(gtk::Orientation::Vertical)
+            .tooltip_markup(format!(
+                "<b>Comment ID:</b> {}\n<b>Post ID:</b> {}",
+                comment.comment_id, comment.post_id
+            ))
+            .build();
+        main_layout.append(&sidebar_layout);
 
-    comment_sidebar_layout.append(
-        &gtk::Label::builder()
-            .label(comment.score.to_string())
-            .css_classes(if comment.score >= 0 {
-                ["success"]
-            } else {
-                ["error"]
-            })
-            .margin_top(10)
-            .margin_bottom(10)
-            .margin_start(10)
-            .margin_end(10)
-            .build(),
-    );
+        sidebar_layout.append(
+            &gtk::Label::builder()
+                .label(comment.score.to_string())
+                .css_classes(if comment.score >= 0 {
+                    ["success"]
+                } else {
+                    ["error"]
+                })
+                .margin_top(10)
+                .margin_bottom(10)
+                .margin_start(10)
+                .margin_end(10)
+                .build(),
+        );
+    }
 
-    comment_layout.append(&gtk::Separator::new(gtk::Orientation::Vertical));
+    // Separator between sidebar and body
+    main_layout.append(&gtk::Separator::new(gtk::Orientation::Vertical));
 
-    let comment_body_layout = gtk::Box::builder()
+    let comment_layout = gtk::Box::builder()
         .orientation(gtk::Orientation::Horizontal)
         .build();
-    comment_layout.append(&comment_body_layout);
+    main_layout.append(&comment_layout);
 
     match &comment.body_markdown {
         Some(body_markdown) => {
             let md_view = MarkdownView::from_str(body_markdown).unwrap();
 
-            comment_body_layout.append(&md_view.text_view);
+            comment_layout.append(&md_view.text_view);
         }
-        None => comment_body_layout.append(
+        None => comment_layout.append(
             &gtk::Label::builder()
-                .label("No content")
+                .label("No Content")
                 .css_classes(["dim-label"])
                 .build(),
         ),
     };
 
-    // TODO: Make it adabtable with small window width.
-    let comment_footer_layout = gtk::Box::builder()
-        .orientation(gtk::Orientation::Horizontal)
-        .build();
-    comment_body_layout.append(&comment_footer_layout);
+    // Meta data layout
+    {
+        // TODO: Make it adabtable with small window width.
+        let comment_meta_layout = gtk::Box::builder()
+            .orientation(gtk::Orientation::Horizontal)
+            .build();
+        comment_layout.append(&comment_meta_layout);
 
-    comment_footer_layout.append(&st_user(&comment.owner, true));
+        comment_meta_layout.append(&st_user(&comment.owner, true));
 
-    comment_footer_layout.append(
-        &gtk::Label::builder()
-            .use_markup(true)
-            .label(format!(
-                " <b>at</b> {}",
-                comment.creation_date.formate_date_time_string()
-            ))
-            .margin_end(10)
-            .build(),
-    );
+        comment_meta_layout.append(
+            &gtk::Label::builder()
+                .use_markup(true)
+                .label(format!(
+                    " <b>at</b> {}",
+                    comment.creation_date.formate_date_time_string()
+                ))
+                .margin_end(10)
+                .build(),
+        );
+    }
 
     gtk::Frame::builder()
-        .child(&comment_layout)
+        .child(&main_layout)
         .margin_top(5)
         .margin_bottom(5)
         .margin_start(5)
