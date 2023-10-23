@@ -19,20 +19,20 @@ strip = true
 
 [dependencies]
 icu = { version = "1.3.2", features = ["std"] }
-markdown = "1.0.0-alpha.13"
+markdown = "1.0.0-alpha.14"
 once_cell = "1.18.0"
-relm4 = { version = "0.7.0-alpha.1", features = ["libadwaita", "macros"] }
-reqwest = { version = "0.11.20", features = ["json", "gzip"] }
-serde = { version = "1.0.188", features = ["derive"] }
-serde_json = { version = "1.0.106" }
-shadow-rs = "0.23.0"
+relm4 = { version = "0.7.0-alpha.2", features = ["libadwaita", "macros"] }
+reqwest = { version = "0.11.22", features = ["json", "gzip"] }
+serde = { version = "1.0.189", features = ["derive"] }
+serde_json = { version = "1.0.107" }
+shadow-rs = "0.24.1"
 
 [build-dependencies]
-shadow-rs = "0.23.0"
+shadow-rs = "0.24.1"
 
 [dependencies.adw]
 package = "libadwaita"
-version = "0.5.2"
+version = "0.5.3"
 features = ["v1_3"]
 
 [dependencies.relm4-icons]
