@@ -245,14 +245,14 @@ impl AsyncComponent for AppModel {
             }
         });
 
-        // Create Flap for the sidebar and the tab view
-        let flap = adw::Flap::builder()
+        // Create split view for the sidebar and the tab view
+        let split_view = adw::OverlaySplitView::builder()
             .content(&tab_view)
-            .flap(model.side_bar_controller.widget())
-            .reveal_flap(false)
-            .flap_position(gtk::PackType::End)
+            .sidebar(model.side_bar_controller.widget())
+            .sidebar_position(gtk::PackType::End)
+            .show_sidebar(false)
             .build();
-        main_layout.append(&flap);
+        main_layout.append(&split_view);
 
         // Create tab button in the header
         let tab_button = adw::TabButton::builder()
@@ -271,20 +271,22 @@ impl AsyncComponent for AppModel {
             .build();
         root.set_content(Some(&tab_overview));
 
-        // Create side bar button in the header
+        // Create sidebar button in the header
         let sidebar_toggle_button = gtk::ToggleButton::builder()
             .icon_name(icon_name::DOCK_RIGHT)
             .build();
         header.pack_end(&sidebar_toggle_button);
 
-        sidebar_toggle_button.connect_clicked(gtk::glib::clone!(@strong flap => move |button| {
-            flap.set_reveal_flap(button.is_active());
-        }));
+        sidebar_toggle_button.connect_clicked(
+            gtk::glib::clone!(@strong split_view => move |button| {
+                split_view.set_show_sidebar(button.is_active());
+            }),
+        );
 
-        // When flap is revealed or hidden change button status.
-        flap.connect_reveal_flap_notify(
-            gtk::glib::clone!(@strong sidebar_toggle_button => move |flap| {
-                sidebar_toggle_button.set_active(flap.reveals_flap());
+        // When sidebar is revealed or hidden change button status.
+        split_view.connect_show_sidebar_notify(
+            gtk::glib::clone!(@strong sidebar_toggle_button => move |split_view| {
+                sidebar_toggle_button.set_active(split_view.shows_sidebar());
             }),
         );
 
