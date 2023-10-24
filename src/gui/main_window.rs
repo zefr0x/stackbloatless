@@ -28,7 +28,6 @@ pub const APP_NAME: &str = "StackBloatLess";
 #[derive(Debug, Clone)]
 pub enum AppInput {
     RequestPagesByUri(stackexchange::Uri),
-    ToggleSearchEntry,
     ShowAboutWindow,
     ToggleSideBar,
     Quit,
@@ -49,11 +48,7 @@ pub struct AppModel {
 
 pub struct AppWidgets {
     tab_view: adw::TabView,
-    header: adw::HeaderBar,
-    search_button: gtk::ToggleButton,
-    search_entry: gtk::SearchEntry,
     sidebar_toggle_button: gtk::ToggleButton,
-    title_widget: adw::WindowTitle,
 }
 
 #[relm4::async_trait::async_trait(?Send)]
@@ -116,14 +111,28 @@ impl AsyncComponent for AppModel {
 
         let main_layout = gtk::Box::new(gtk::Orientation::Vertical, 0);
 
-        // Create header bar
-        let title_widget = adw::WindowTitle::builder()
-            .title(APP_NAME)
-            .subtitle("Your 1000 tabs are in safe hands")
+        // Create search entry
+        // TODO: Use the search entry for searching inside a page.
+        // TODO: Use the new tab page as a search page.
+        let search_entry = gtk::SearchEntry::builder()
+            // TODO: Make clickable icon to select a stackexchange site to search in.
+            .placeholder_text("Enter a search term or question id")
             .build();
 
+        search_entry.connect_activate(gtk::glib::clone!(@strong sender => move |entry| {
+            let search_term = entry.text();
+            // TODO: Change how search_term is parsed to support urls and terms at the same time.
+            // TODO: Connect it to search api
+            // TODO: Don't accept uris.
+            // TODO: Support all stackexchange sites: https://api.stackexchange.com/docs/sites
+            sender.input(AppInput::RequestPagesByUri(format!("stackexchange://stackoverflow/{search_term}")));
+            entry.delete_text(0, search_term.len() as i32);
+        }));
+
+        // Create header bar
         let header = adw::HeaderBar::builder()
-            .title_widget(&title_widget)
+            .title_widget(&search_entry)
+            .hexpand(true)
             .show_end_title_buttons(true)
             .build();
 
@@ -182,34 +191,6 @@ impl AsyncComponent for AppModel {
             .build();
 
         header.pack_start(&menu_button);
-
-        // Search button and entry
-        let search_button = gtk::ToggleButton::builder()
-            .icon_name(icon_name::LOUPE)
-            .build();
-
-        search_button.connect_clicked(gtk::glib::clone!(@strong sender => move |_search_button| {
-            sender.input(AppInput::ToggleSearchEntry);
-        }));
-
-        header.pack_start(&search_button);
-
-        // TODO: Use the search entry for searching inside a page.
-        // TODO: Use the new tab page as a search page.
-        let search_entry = gtk::SearchEntry::builder()
-            // TODO: Make icon clickable to select a stackexchange site to search in.
-            .placeholder_text("Enter a search term or question id")
-            .build();
-
-        search_entry.connect_activate(gtk::glib::clone!(@strong sender => move |entry| {
-            let search_term = entry.text();
-            // TODO: Change how search_term is parsed to support urls and terms at the same time.
-            // TODO: Connect it to search api
-            // TODO: Don't accept uris.
-            // TODO: Support all stackexchange sites: https://api.stackexchange.com/docs/sites
-            sender.input(AppInput::RequestPagesByUri(format!("stackexchange://stackoverflow/{search_term}")));
-            entry.delete_text(0, search_term.len() as i32);
-        }));
 
         // Create tab actions
         relm4::new_action_group!(TabActionGroup, "tab");
@@ -309,11 +290,7 @@ impl AsyncComponent for AppModel {
 
         let widgets = AppWidgets {
             tab_view,
-            header,
-            search_button,
-            search_entry,
             sidebar_toggle_button,
-            title_widget,
         };
 
         AsyncComponentParts { model, widgets }
@@ -350,16 +327,6 @@ impl AsyncComponent for AppModel {
                     // tab_page.set_keyword(keyword);
 
                     tab_page.set_title(&question.title);
-                }
-            }
-            AppInput::ToggleSearchEntry => {
-                if widgets.search_button.is_active() {
-                    widgets.header.set_title_widget(Some(&widgets.search_entry));
-                    widgets.search_entry.show();
-                    widgets.search_entry.grab_focus();
-                } else {
-                    widgets.search_entry.hide();
-                    widgets.header.set_title_widget(Some(&widgets.title_widget));
                 }
             }
             AppInput::ShowAboutWindow => {
