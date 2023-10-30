@@ -6,7 +6,6 @@
 
 Blazingly fast, clean, and effective **native** [Linux](https://en.wikipedia.org/wiki/Linux) desktop [GUI](https://en.wikipedia.org/wiki/Graphical_user_interface) for [**StackExchange**](https://en.wikipedia.org/wiki/Stack_Exchange_Network) sites.
 
-
 ---
 
 [<kbd><br><b>Install</b><br><br></kbd>](#installation)
@@ -38,6 +37,7 @@ Blazingly fast, clean, and effective **native** [Linux](https://en.wikipedia.org
 ## Installation
 
 ### Download Binary From Github
+
 For every new release a Github workflow will build a binary in Github servers and will upload it as a release asset in Github releases.
 
 You can find the latest Github release [here](https://github.com/zefr0x/stackbloatless/releases/latest) or the releases page [here](https://github.com/zefr0x/stackbloatless/releases).
@@ -67,9 +67,11 @@ You are able to search for questions from the application using StackExchange's 
 You are recomended to use a web browser and your search engine of choice along with a browser extension to redirect any questions under the StackExchange network to be opened inside StackBloatLess.
 
 StackBloatLess accept StackExchange questions in the next format to be opened in it:
+
 ```
 stackexchange://{api_site_parameter}/{ids}
 ```
+
 Where `{api_site_parameter}` is specific to single StackExchange site that could be found [here](https://api.stackexchange.com/docs/sites#pagesize=500&filter=!SldCuNUOz*uwhNyRzh&run=true), and `{ids}` is a list of questions ids seprated by `;`, like `id;id;id;id...`.
 
 ## Screenshots
