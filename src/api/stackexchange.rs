@@ -65,11 +65,11 @@ pub struct Question {
     pub creation_date: Date,
     pub is_answered: bool,
     pub last_activity_date: Date,
-    link: String, // Url
+    // link: String, // Url
     pub owner: User,
     pub question_id: Id,
     pub score: i32,
-    tags: Vec<String>,
+    // tags: Vec<String>,
     pub title: String,
     pub view_count: u32,
 }

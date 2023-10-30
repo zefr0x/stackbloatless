@@ -91,6 +91,13 @@ pub fn st_question(question: &Question) -> gtk::Box {
 
             question_header.append(&owner_avatar);
         }
+
+        // TODO: Show question tags
+        // // Only 5 tags at a maximum
+        // // Ref: https://stackoverflow.com/help/tagging
+        // for tag in question.tags.iter() {
+        //     question_header.append(&gtk::Label::new(Some(tag)));
+        // }
     }
 
     // Separator between header and question
@@ -137,48 +144,42 @@ pub fn st_question(question: &Question) -> gtk::Box {
     }
 
     // Comments
-    match &question.comments {
-        Some(comments) => {
-            main_layout.append(
-                &gtk::Label::builder()
-                    // FIX: Use plural form for `Comments`.
-                    .label(format!("{} Comments", question.comment_count))
-                    .css_classes(["heading"])
-                    .halign(gtk::Align::Start)
-                    .build(),
-            );
-            // TODO: Implement show-more button for comments.
-            for comment in comments {
-                main_layout.append(&st_comment(comment));
-            }
+    if let Some(comments) = &question.comments {
+        main_layout.append(
+            &gtk::Label::builder()
+                // FIX: Use plural form for `Comments`.
+                .label(format!("{} Comments", question.comment_count))
+                .css_classes(["heading"])
+                .halign(gtk::Align::Start)
+                .build(),
+        );
+        // TODO: Implement show-more button for comments.
+        for comment in comments {
+            main_layout.append(&st_comment(comment));
         }
-        None => {}
     }
 
     // Separator between question area and answers
     main_layout.append(&gtk::Separator::new(gtk::Orientation::Horizontal));
 
     // Answers
-    match &question.answers {
-        Some(answers) => {
-            main_layout.append(
-                &gtk::Label::builder()
-                    // FIX: Use plural form for `Answers`.
-                    .label(format!("{} Answers", question.answer_count))
-                    .css_classes(["title-1"])
-                    .margin_start(5)
-                    .margin_end(5)
-                    .margin_top(15)
-                    .margin_bottom(10)
-                    .halign(gtk::Align::Start)
-                    .build(),
-            );
+    if let Some(answers) = &question.answers {
+        main_layout.append(
+            &gtk::Label::builder()
+                // FIX: Use plural form for `Answers`.
+                .label(format!("{} Answers", question.answer_count))
+                .css_classes(["title-1"])
+                .margin_start(5)
+                .margin_end(5)
+                .margin_top(15)
+                .margin_bottom(10)
+                .halign(gtk::Align::Start)
+                .build(),
+        );
 
-            for answer in answers {
-                main_layout.append(&st_answer(answer));
-            }
+        for answer in answers {
+            main_layout.append(&st_answer(answer));
         }
-        None => {}
     }
 
     main_layout
@@ -281,21 +282,18 @@ fn st_answer(answer: &Answer) -> gtk::Frame {
     }
 
     // Comments
-    match &answer.comments {
-        Some(comments) => {
-            main_layout.append(
-                &gtk::Label::builder()
-                    // FIX: Use plural form for `Comments`.
-                    .label(format!("{} Comments", answer.comment_count))
-                    .css_classes(["heading"])
-                    .halign(gtk::Align::Start)
-                    .build(),
-            );
-            for comment in comments {
-                main_layout.append(&st_comment(comment));
-            }
+    if let Some(comments) = &answer.comments {
+        main_layout.append(
+            &gtk::Label::builder()
+                // FIX: Use plural form for `Comments`.
+                .label(format!("{} Comments", answer.comment_count))
+                .css_classes(["heading"])
+                .halign(gtk::Align::Start)
+                .build(),
+        );
+        for comment in comments {
+            main_layout.append(&st_comment(comment));
         }
-        None => {}
     }
 
     gtk::Frame::builder()

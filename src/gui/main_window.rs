@@ -192,6 +192,8 @@ impl AsyncComponent for AppModel {
 
         header.pack_start(&menu_button);
 
+        // TODO: Create copy question link button (after encapsulating questions in relm components).
+
         // Create tab actions
         relm4::new_action_group!(TabActionGroup, "tab");
         relm4::new_stateless_action!(PinTabAction, TabActionGroup, "toggle_pin");
