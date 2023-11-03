@@ -1,7 +1,16 @@
-cargo_env = [ 'CARGO_HOME=' + meson.project_build_root() / 'cargo-home' ]
+if get_option('cargo-home') == ''
+  cargo_env = [ 'CARGO_HOME=' + meson.project_build_root() / 'cargo-home' ]
+else
+  cargo_env = [ 'CARGO_HOME=' + get_option('cargo-home') ]
+endif
 
 cargo_options = [ '--manifest-path', meson.project_source_root() / 'Cargo.toml' ]
 cargo_options += [ '--target-dir', meson.project_build_root() / 'src' ]
+
+# When cargo-home already contain needed deps and we want to build offline.
+if get_option('offline-build')
+  cargo_options += [ '--offline' ]
+endif
 
 if profile == 'release'
   cargo_options += [ '--release' ]

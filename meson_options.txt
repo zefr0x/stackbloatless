@@ -1,4 +1,4 @@
-option (
+option(
   'profile',
   type: 'combo',
   choices: [
@@ -6,4 +6,18 @@ option (
     'debug'
   ],
   value: 'release',
+)
+
+# By default it will use a special cargo-home just for the build.
+option(
+  'cargo-home',
+  type: 'string',
+  value: ''
+)
+
+# By default it will connect to crates.io to check and downlaod missing rust deps.
+option(
+  'offline-build',
+  type: 'boolean',
+  value: false
 )
