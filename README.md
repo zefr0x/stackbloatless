@@ -69,7 +69,7 @@ You are recomended to use a web browser and your search engine of choice along w
 StackBloatLess accept StackExchange questions in the next format to be opened in it:
 
 ```
-stackexchange://{api_site_parameter}/{ids}
+stackbloatless://{api_site_parameter}/{ids}
 ```
 
 Where `{api_site_parameter}` is specific to single StackExchange site that could be found [here](https://api.stackexchange.com/docs/sites#pagesize=500&filter=!SldCuNUOz*uwhNyRzh&run=true), and `{ids}` is a list of questions ids seprated by `;`, like `id;id;id;id...`.

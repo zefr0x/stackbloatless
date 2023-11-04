@@ -86,11 +86,11 @@ impl StackExchange {
     }
 
     pub async fn get_questions_from_uri(&self, uri: &str) -> Result<Vec<Question>, String> {
-        // Accept uris of form: stackexchange://{site}/{questions ids}
-        // For example: stackexchange://stackoverflow/123456;7891011;121314
+        // Accept uris of form: stackbloatless://{site}/{questions ids}
+        // For example: stackbloatless://stackoverflow/123456;7891011;121314
         let uri = Url::parse(uri).unwrap();
 
-        // TODO: Check if shame is stackexchange or not.
+        // TODO: Check if shame is stackbloatless or not.
         // TODO: Check if questions ids are valid.
 
         self.get_questions(uri.domain().unwrap(), uri.path()).await

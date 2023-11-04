@@ -125,7 +125,7 @@ impl AsyncComponent for AppModel {
             // TODO: Connect it to search api
             // TODO: Don't accept uris.
             // TODO: Support all stackexchange sites: https://api.stackexchange.com/docs/sites
-            sender.input(AppInput::RequestPagesByUri(format!("stackexchange://stackoverflow/{search_term}")));
+            sender.input(AppInput::RequestPagesByUri(format!("stackbloatless://stackoverflow/{search_term}")));
             entry.delete_text(0, search_term.len() as i32);
         }));
 

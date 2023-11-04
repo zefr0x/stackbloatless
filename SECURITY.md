@@ -1,7 +1,7 @@
 # Security Policy
 
 > **NOTE**
-> This application intracts with web content, and handles opening URIs with `x-scheme-handler/stackexchange` MIME type.
+> This application intracts with web content, and handles opening URIs with `x-scheme-handler/stackbloatless` MIME type.
 
 ## Supported Versions
 
