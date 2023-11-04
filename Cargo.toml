@@ -1,6 +1,6 @@
 [package]
 name = "stackbloatless"
-version = "0.1.0-alpha.1"
+version = "0.1.0-alpha.2"
 authors = ["zefr0x"]
 edition = "2021"
 description = "A clean and effective interface for stackexchange sites"

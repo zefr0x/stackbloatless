@@ -1,5 +1,26 @@
 # Unreleased
 
+# 0.1.0alpha.2
+
+- Improved
+
+  - Improve markdown view componants.
+  - Reduce release builds binary size.
+
+- Added
+
+  - Render tables in markdown view.
+  - Display most user, question, answers, and comments meta data.
+
+- Fixed
+
+  - Colors in markdown view when using light themes.
+
+- Changed
+
+  - Make the search entery always visible, and delete header title.
+  - Update libadwaita to 1.4
+
 # 0.1.0alpha.1
 
 - Improved
@@ -15,6 +36,7 @@
   - Placeholder sidebar for bookamrks and history.
 
 - Changed
+
   - Use `relm4-icons` to embed icons rather then depending in the system to provide them.
 
 # 0.1.0alpha.0
