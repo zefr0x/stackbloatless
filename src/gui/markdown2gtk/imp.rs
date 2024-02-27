@@ -355,7 +355,6 @@ impl MarkdownView {
         }
     }
 
-    // TODO: Insert GridView into the buffer directly from this function.
     fn md_table2grid_view(&mut self, table: &mdast::Table) {
         let model = gtk::gio::ListStore::new::<CellObject>();
         let mut columns_count = 0;

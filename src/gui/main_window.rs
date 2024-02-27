@@ -6,6 +6,7 @@ use relm4::{
         AsyncComponent, AsyncComponentController, AsyncComponentParts, AsyncComponentSender,
         AsyncController, Connector,
     },
+    factory::FactoryVecDeque,
     gtk::{
         prelude::ApplicationExt,
         traits::{GtkApplicationExt, WidgetExt},
@@ -47,7 +48,7 @@ pub struct AppModel {
 }
 
 pub struct AppWidgets {
-    tab_view: adw::TabView,
+    questions_tabs: FactoryVecDeque<componant_builders::QuestionPageModel>,
     sidebar_toggle_button: gtk::ToggleButton,
 }
 
@@ -239,7 +240,14 @@ impl AsyncComponent for AppModel {
             .margin_top(5)
             .build();
 
-        tab_bar.set_view(Some(&tab_view));
+        // Create tabs factory to manage tabs.
+        let questions_tabs = FactoryVecDeque::<componant_builders::QuestionPageModel>::builder()
+            .launch(tab_view)
+            .forward(sender.input_sender(), |_message| unreachable!());
+        // A refrence for TabView that is owned by FactoryVecDeque.
+        let tab_view = questions_tabs.widget();
+
+        tab_bar.set_view(Some(tab_view));
 
         tab_view.connect_setup_menu(|view, page| {
             if let Some(page) = page {
@@ -249,7 +257,7 @@ impl AsyncComponent for AppModel {
 
         // Create split view for the sidebar and the tab view
         let split_view = adw::OverlaySplitView::builder()
-            .content(&tab_view)
+            .content(tab_view)
             .sidebar(model.side_bar_controller.widget())
             .sidebar_position(gtk::PackType::End)
             .show_sidebar(false)
@@ -258,7 +266,7 @@ impl AsyncComponent for AppModel {
 
         // Create tab button in the header
         let tab_button = adw::TabButton::builder()
-            .view(&tab_view)
+            .view(tab_view)
             .action_name("overview.open")
             .build();
         header.pack_end(&tab_button);
@@ -266,7 +274,7 @@ impl AsyncComponent for AppModel {
         // Create tabs overview
         // FIX: Whene the last tab is closed, close the overview.
         let tab_overview = adw::TabOverview::builder()
-            .view(&tab_view)
+            .view(tab_view)
             // TODO: Implement new tab
             // .enable_new_tab(true)
             .child(&main_layout)
@@ -293,7 +301,7 @@ impl AsyncComponent for AppModel {
         );
 
         let widgets = AppWidgets {
-            tab_view,
+            questions_tabs,
             sidebar_toggle_button,
         };
 
@@ -317,20 +325,10 @@ impl AsyncComponent for AppModel {
                     .unwrap();
 
                 for question in questions {
-                    let question_box = componant_builders::st_question(&question);
-
-                    let tab_page = widgets.tab_view.append(
-                        &gtk::ScrolledWindow::builder()
-                            .child(&question_box)
-                            .vexpand(true)
-                            .hexpand(true)
-                            .build(),
-                    );
-
-                    // TODO: Pass question tags as keywords.
-                    // tab_page.set_keyword(keyword);
-
-                    tab_page.set_title(&question.title);
+                    widgets
+                        .questions_tabs
+                        .guard()
+                        .push_front(componant_builders::QuestionPageInit { question });
                 }
             }
             AppInput::ShowAboutWindow => {
@@ -346,14 +344,16 @@ impl AsyncComponent for AppModel {
                 relm4::main_application().quit();
             }
             AppInput::ToggleSelectedTabPin => {
-                let selected_page = widgets.tab_view.selected_page().unwrap();
+                let selected_page = widgets.questions_tabs.widget().selected_page().unwrap();
 
                 widgets
-                    .tab_view
+                    .questions_tabs
+                    .widget()
                     .set_page_pinned(&selected_page, !selected_page.is_pinned())
             }
             AppInput::CloseTab => {
-                let selected_page = widgets.tab_view.selected_page().unwrap();
+                let tab_view = widgets.questions_tabs.widget();
+                let selected_page = tab_view.selected_page().unwrap();
 
                 // Ask before closing a pinned tab
                 if selected_page.is_pinned() {
@@ -380,14 +380,22 @@ impl AsyncComponent for AppModel {
                         }),
                     );
                 } else {
-                    widgets.tab_view.close_page(&selected_page);
+                    // FIX: Find the right index.
+                    let page_index = tab_view.page_position(&selected_page) as usize;
+
+                    widgets.questions_tabs.guard().remove(page_index);
                 }
             }
             AppInput::ClosePinnedTab => {
-                let selected_page = widgets.tab_view.selected_page().unwrap();
+                let tab_view = widgets.questions_tabs.widget();
+                let selected_page = tab_view.selected_page().unwrap();
 
-                widgets.tab_view.set_page_pinned(&selected_page, false);
-                widgets.tab_view.close_page(&selected_page);
+                tab_view.set_page_pinned(&selected_page, false);
+
+                // FIX: Find the right index.
+                let page_index = tab_view.page_position(&selected_page) as usize;
+
+                widgets.questions_tabs.guard().remove(page_index);
             }
         }
     }
