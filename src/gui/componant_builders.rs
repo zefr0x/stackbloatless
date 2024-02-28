@@ -5,6 +5,7 @@ use relm4::prelude::*;
 
 use super::markdown2gtk::MarkdownView;
 use crate::api::stackexchange::{Answer, Comment, DateExt, Question, User};
+use crate::fl;
 
 pub struct QuestionPageModel {
     question: Question,
@@ -94,14 +95,14 @@ impl QuestionPageModel {
             if question.is_answered {
                 question_header.append(
                     &gtk::Label::builder()
-                        .label("Answered")
+                        .label(fl!("question-answered"))
                         .css_classes(["success", "heading"])
                         .build(),
                 );
             } else {
                 question_header.append(
                     &gtk::Label::builder()
-                        .label("Not Answered")
+                        .label(fl!("question-not-answered"))
                         .css_classes(["warning", "heading"])
                         .build(),
                 )
@@ -110,7 +111,7 @@ impl QuestionPageModel {
             question_header.append(
                 &gtk::Label::builder()
                     .use_markup(true)
-                    .label(format!("<b>View Count:</b> {}", question.view_count))
+                    .label(fl!("question-view-count", count = question.view_count))
                     .margin_start(20)
                     .build(),
             );
@@ -118,9 +119,9 @@ impl QuestionPageModel {
             question_header.append(
                 &gtk::Label::builder()
                     .use_markup(true)
-                    .label(format!(
-                        "<b>Created:</b> {}",
-                        question.creation_date.formate_date_time_string()
+                    .label(fl!(
+                        "creation-time",
+                        time = question.creation_date.formate_date_time_string()
                     ))
                     .margin_start(20)
                     .build(),
@@ -129,9 +130,9 @@ impl QuestionPageModel {
             question_header.append(
                 &gtk::Label::builder()
                     .use_markup(true)
-                    .label(format!(
-                        "<b>Last Active:</b> {}",
-                        question.last_activity_date.formate_date_time_string()
+                    .label(fl!(
+                        "last-active-time",
+                        time = question.last_activity_date.formate_date_time_string()
                     ))
                     .margin_start(20)
                     .build(),
@@ -166,7 +167,7 @@ impl QuestionPageModel {
         {
             let question_sidebar_layout = gtk::Box::builder()
                 .orientation(gtk::Orientation::Vertical)
-                .tooltip_markup(format!("<b>Question ID:</b> {}", question.question_id))
+                .tooltip_markup(fl!("question-id", id = question.question_id))
                 .build();
             question_layout.append(&question_sidebar_layout);
 
@@ -200,8 +201,7 @@ impl QuestionPageModel {
         if let Some(comments) = &question.comments {
             main_layout.append(
                 &gtk::Label::builder()
-                    // FIX: Use plural form for `Comments`.
-                    .label(format!("{} Comments", question.comment_count))
+                    .label(fl!("comments-count", count = question.comment_count))
                     .css_classes(["heading"])
                     .halign(gtk::Align::Start)
                     .build(),
@@ -219,8 +219,7 @@ impl QuestionPageModel {
         if let Some(answers) = &question.answers {
             main_layout.append(
                 &gtk::Label::builder()
-                    // FIX: Use plural form for `Answers`.
-                    .label(format!("{} Answers", question.answer_count))
+                    .label(fl!("answers-count", count = question.answer_count))
                     .css_classes(["title-1"])
                     .margin_start(5)
                     .margin_end(5)
@@ -254,7 +253,7 @@ impl QuestionPageModel {
             if answer.is_accepted {
                 answer_header.append(
                     &gtk::Label::builder()
-                        .label("Accepted")
+                        .label(fl!("answer-accepted"))
                         .css_classes(["success", "heading"])
                         .build(),
                 );
@@ -263,9 +262,9 @@ impl QuestionPageModel {
             answer_header.append(
                 &gtk::Label::builder()
                     .use_markup(true)
-                    .label(format!(
-                        "<b>Created:</b> {}",
-                        answer.creation_date.formate_date_time_string()
+                    .label(fl!(
+                        "creation-time",
+                        time = answer.creation_date.formate_date_time_string()
                     ))
                     .margin_start(20)
                     .build(),
@@ -274,9 +273,9 @@ impl QuestionPageModel {
             answer_header.append(
                 &gtk::Label::builder()
                     .use_markup(true)
-                    .label(format!(
-                        "<b>Last Active:</b> {}",
-                        answer.last_activity_date.formate_date_time_string()
+                    .label(fl!(
+                        "last-active-time",
+                        time = answer.last_activity_date.formate_date_time_string()
                     ))
                     .margin_start(20)
                     .build(),
@@ -304,7 +303,7 @@ impl QuestionPageModel {
         {
             let answer_sidebar_layout = gtk::Box::builder()
                 .orientation(gtk::Orientation::Vertical)
-                .tooltip_markup(format!("<b>Answer ID:</b> {}", answer.answer_id))
+                .tooltip_markup(fl!("answer-id", id = answer.answer_id))
                 .build();
             answer_layout.append(&answer_sidebar_layout);
 
@@ -338,8 +337,7 @@ impl QuestionPageModel {
         if let Some(comments) = &answer.comments {
             main_layout.append(
                 &gtk::Label::builder()
-                    // FIX: Use plural form for `Comments`.
-                    .label(format!("{} Comments", answer.comment_count))
+                    .label(fl!("comments-count", count = answer.comment_count))
                     .css_classes(["heading"])
                     .halign(gtk::Align::Start)
                     .build(),
@@ -367,9 +365,10 @@ impl QuestionPageModel {
         {
             let sidebar_layout = gtk::Box::builder()
                 .orientation(gtk::Orientation::Vertical)
-                .tooltip_markup(format!(
-                    "<b>Comment ID:</b> {}\n<b>Post ID:</b> {}",
-                    comment.comment_id, comment.post_id
+                .tooltip_markup(fl!(
+                    "comment-tooltip",
+                    comment_id = comment.comment_id,
+                    post_id = comment.post_id
                 ))
                 .build();
             main_layout.append(&sidebar_layout);
@@ -406,7 +405,7 @@ impl QuestionPageModel {
             }
             None => comment_layout.append(
                 &gtk::Label::builder()
-                    .label("No Content")
+                    .label(fl!("comment-empty"))
                     .css_classes(["dim-label"])
                     .build(),
             ),
@@ -425,9 +424,9 @@ impl QuestionPageModel {
             comment_meta_layout.append(
                 &gtk::Label::builder()
                     .use_markup(true)
-                    .label(format!(
-                        " <b>at</b> {}",
-                        comment.creation_date.formate_date_time_string()
+                    .label(fl!(
+                        "comment-time",
+                        time = comment.creation_date.formate_date_time_string()
                     ))
                     .margin_end(10)
                     .build(),
@@ -470,14 +469,14 @@ impl QuestionPageModel {
                 Some(link) => link,
                 None => "",
             })
-            .tooltip_markup(format!(
-                "<b>Name:</b> {}\n<b>ID:</b> {}\n<b>Reputation:</b> {}",
-                user.display_name,
-                match user.user_id {
+            .tooltip_markup(fl!(
+                "user-tooltip",
+                name = user.display_name.as_str(),
+                id = match user.user_id {
                     Some(user_id) => user_id.to_string(),
-                    None => "Not Available".to_owned(),
+                    None => fl!("not-available"),
                 },
-                user.reputation.unwrap()
+                reputation = user.reputation.unwrap()
             ))
             .build()
     }

@@ -6,6 +6,7 @@ use relm4::{
 };
 
 use super::main_window::{build_time, APP_NAME};
+use crate::fl;
 
 pub struct AboutWindow {
     developers_list: Vec<String>,
@@ -127,7 +128,7 @@ impl Component for AboutWindow {
                     .build();
 
                 about_window.add_link(
-                    "Release Notes",
+                    &fl!("release-notes"),
                     "https://github.com/zefr0x/stackbloatless/blob/main/CHANGELOG.md",
                 );
 

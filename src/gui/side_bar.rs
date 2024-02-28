@@ -5,6 +5,8 @@ use relm4::{
 };
 use relm4_icons::icon_name;
 
+use crate::fl;
+
 pub struct SideBarModel;
 
 pub struct SideBarWidgest;
@@ -51,7 +53,7 @@ impl SimpleAsyncComponent for SideBarModel {
         side_bar_view.add_titled_with_icon(
             &adw::StatusPage::builder()
                 .title("Bookmarks")
-                .child(&gtk::Label::new(Some("Placeholder")))
+                .child(&gtk::Label::new(Some(&fl!("placeholder"))))
                 .icon_name(icon_name::LIBRARY)
                 .build(),
             None,
@@ -63,7 +65,7 @@ impl SimpleAsyncComponent for SideBarModel {
         side_bar_view.add_titled_with_icon(
             &adw::StatusPage::builder()
                 .title("History")
-                .child(&gtk::Label::new(Some("Placeholder")))
+                .child(&gtk::Label::new(Some(&fl!("placeholder"))))
                 .icon_name(icon_name::HISTORY_UNDO)
                 .build(),
             None,

@@ -20,6 +20,7 @@ use super::about_dialog::{AboutWindow, AboutWindowInput};
 use super::componant_builders;
 use super::side_bar;
 use crate::api::stackexchange;
+use crate::fl;
 
 // Save build-time informations
 shadow_rs::shadow!(build_time);
@@ -117,7 +118,7 @@ impl AsyncComponent for AppModel {
         // TODO: Use the new tab page as a search page.
         let search_entry = gtk::SearchEntry::builder()
             // TODO: Make clickable icon to select a stackexchange site to search in.
-            .placeholder_text("Enter a search term or question id")
+            .placeholder_text(fl!("search-entry-placeholder"))
             .build();
 
         search_entry.connect_activate(gtk::glib::clone!(@strong sender => move |entry| {
@@ -177,8 +178,8 @@ impl AsyncComponent for AppModel {
 
         relm4::menu! {
             main_menu: {
-                "About" => AboutAction,
-                "Quit" => QuitAction
+                &fl!("about") => AboutAction,
+                &fl!("quit") => QuitAction
             }
         }
 
@@ -223,8 +224,8 @@ impl AsyncComponent for AppModel {
 
         relm4::menu! {
             tab_menu: {
-                "Pin/Unpin" => PinTabAction,
-                "Close" => CloseTabAction,
+                &fl!("toggle-pin") => PinTabAction,
+                &fl!("close") => CloseTabAction,
             }
         }
 
@@ -359,11 +360,11 @@ impl AsyncComponent for AppModel {
                 if selected_page.is_pinned() {
                     let warning_message = adw::MessageDialog::builder()
                         .transient_for(&relm4::main_application().active_window().unwrap())
-                        .heading("Close pinned tab?")
-                        .body("Do you really want to close a pinned tab?")
+                        .heading(fl!("close-pinned-tab-confirmation-header"))
+                        .body(fl!("close-pinned-tab-confirmation-body"))
                         .build();
 
-                    warning_message.add_responses(&[("yes", "Yes"), ("no", "No")]);
+                    warning_message.add_responses(&[("yes", &fl!("yes")), ("no", &fl!("no"))]);
                     warning_message.set_default_response(Some("no"));
                     warning_message
                         .set_response_appearance("yes", adw::ResponseAppearance::Destructive);
