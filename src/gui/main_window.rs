@@ -38,9 +38,7 @@ pub enum AppInput {
     ClosePinnedTab,
 }
 
-pub struct AppInit {
-    pub receiver: relm4::Receiver<AppInput>,
-}
+pub struct AppInit {}
 
 pub struct AppModel {
     stackexchange_client: stackexchange::StackExchange,
@@ -78,7 +76,7 @@ impl AsyncComponent for AppModel {
     }
 
     async fn init(
-        init: Self::Init,
+        _init: Self::Init,
         root: Self::Root,
         sender: AsyncComponentSender<Self>,
     ) -> AsyncComponentParts<Self> {
@@ -104,12 +102,6 @@ impl AsyncComponent for AppModel {
 
         // Load icons
         relm4_icons::initialize_icons();
-
-        // Listen to messages sent from the main function.
-        sender.oneshot_command(
-            init.receiver
-                .forward(sender.input_sender().to_owned(), |msg| msg),
-        );
 
         let main_layout = gtk::Box::new(gtk::Orientation::Vertical, 0);
 

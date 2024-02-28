@@ -8,14 +8,16 @@ mod utils;
 
 const APP_ID: &str = "io.github.zefr0x.stackbloatless";
 
+// Create a communication channel to communicate with the main app component.
+static BASE_BROKER: relm4::MessageBroker<gui::main_window::AppInput> = relm4::MessageBroker::new();
+
 fn main() {
     let base_app = adw::Application::builder()
         .application_id(APP_ID)
         .flags(relm4::gtk::gio::ApplicationFlags::HANDLES_OPEN)
         .build();
 
-    // Create a communication channel to send messages to the app component.
-    let (sender, receiver) = relm4::channel::<gui::main_window::AppInput>();
+    let sender = BASE_BROKER.sender();
 
     base_app.connect_open(
         gtk::glib::clone!(@strong sender => move |application, files, _hint| {
@@ -33,5 +35,6 @@ fn main() {
 
     relm4::RelmApp::from_app(base_app)
         .with_args(std::env::args().collect::<Vec<String>>())
-        .run_async::<gui::main_window::AppModel>(gui::main_window::AppInit { receiver });
+        .with_broker(&BASE_BROKER)
+        .run_async::<gui::main_window::AppModel>(gui::main_window::AppInit {});
 }

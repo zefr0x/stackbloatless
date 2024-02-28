@@ -18,6 +18,9 @@ pub static LANG_LOADER: Lazy<FluentLanguageLoader> = Lazy::new(|| {
     loader
 });
 
+// TODO: Integrate ICU in Fluent.
+// https://docs.rs/fluent-datetime/latest/fluent_datetime/
+
 #[macro_export]
 macro_rules! fl {
     ($message_id:literal) => {{

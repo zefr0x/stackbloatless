@@ -143,7 +143,8 @@ impl DateExt for Date {
 
         let calendar = icu::calendar::AnyCalendar::new_for_locale(&locale);
 
-        // PERF: Use static formatter and calendar to be initialized once.
+        // PERF: Use static formatter and calendar to be initialized once (can't share between
+        // threads safely).
         let formatter = DateTimeFormatter::try_new(&locale, Default::default()).unwrap();
 
         formatter
