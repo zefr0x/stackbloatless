@@ -18,20 +18,18 @@ fn main() {
     let (sender, receiver) = relm4::channel::<gui::main_window::AppInput>();
 
     base_app.connect_open(
-        gtk::glib::clone!(@strong sender => move |_application, files, _hint| {
+        gtk::glib::clone!(@strong sender => move |application, files, _hint| {
             let uris = files.iter().map(|file| file.uri().to_string()).collect::<Vec<String>>();
 
             for uri in uris {
                 sender.send(gui::main_window::AppInput::RequestPagesByUri(uri)).unwrap();
             }
+
+            application.activate();
         }),
     );
 
     // FIX: Close remote instance after sending the `open` signal.
-
-    base_app.connect_startup(|application| {
-        application.activate();
-    });
 
     relm4::RelmApp::from_app(base_app)
         .with_args(std::env::args().collect::<Vec<String>>())

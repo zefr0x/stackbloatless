@@ -66,7 +66,7 @@ impl AsyncComponent for AppModel {
         adw::Window::builder().title(APP_NAME).build()
     }
 
-    fn init_loading_widgets(root: &mut Self::Root) -> Option<LoadingWidgets> {
+    fn init_loading_widgets(root: Self::Root) -> Option<LoadingWidgets> {
         let spinner = gtk::Spinner::builder()
             .halign(gtk::Align::Center)
             .valign(gtk::Align::Center)

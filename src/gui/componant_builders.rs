@@ -44,7 +44,7 @@ impl FactoryComponent for QuestionPageModel {
     fn init_widgets(
         &mut self,
         _index: &Self::Index,
-        root: &Self::Root,
+        root: Self::Root,
         retured_widget: &adw::TabPage,
         _sender: FactorySender<Self>,
     ) -> Self::Widgets {

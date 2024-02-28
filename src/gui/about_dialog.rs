@@ -34,7 +34,7 @@ impl Component for AboutWindow {
 
     fn init(
         main_window: Self::Init,
-        _root: &Self::Root,
+        _root: Self::Root,
         _sender: ComponentSender<Self>,
     ) -> ComponentParts<Self> {
         let developers_list = env!("CARGO_PKG_AUTHORS")
