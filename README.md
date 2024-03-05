@@ -44,7 +44,7 @@ You can find the latest Github release [here](https://github.com/zefr0x/stackblo
 
 ## Build
 
-> **Note**
+> [!Note]
 > You need to have [`cargo`](https://doc.rust-lang.org/cargo/) installed in you system.
 
 ```shell
