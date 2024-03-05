@@ -20,7 +20,7 @@ libadwaita = dependency('libadwaita-1', version: '>= 1.4')
 
 cargo = find_program('cargo', required: true)
 desktop_utils = find_program('desktop-file-validate', required: false)
-appstream_util = find_program('appstream-util', required: false)
+appstreamcli = find_program('appstreamcli', required: false)
 
 # Desktop file
 desktop_file ='@0@.desktop'.format(application_id)
@@ -35,6 +35,21 @@ endif
 install_data(
   desktop_file,
   install_dir: 'share/applications'
+)
+
+# App data file
+app_data_file ='@0@.metainfo.xml'.format(application_id)
+
+if appstreamcli.found()
+  test('Validate app data file', appstreamcli,
+    args: ['validate', app_data_file]
+  )
+endif
+
+# Install app data file
+install_data(
+  app_data_file,
+  install_dir: get_option('datadir') + '/metainfo'
 )
 
 # Post install
