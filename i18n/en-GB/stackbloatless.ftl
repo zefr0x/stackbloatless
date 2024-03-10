@@ -13,6 +13,8 @@ yes = Yes
 no = No
 
 
+# https://gnome.pages.gitlab.gnome.org/libadwaita/doc/main/class.AboutDialog.html#credits-and-acknowledgements
+translator-credits = zefr0x https://github.com/zefr0x
 release-notes = Release Notes
 
 
