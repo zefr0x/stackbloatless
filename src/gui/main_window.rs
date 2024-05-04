@@ -344,8 +344,7 @@ impl AsyncComponent for AppModel {
 
                 // Ask before closing a pinned tab
                 if selected_page.is_pinned() {
-                    let warning_message = adw::MessageDialog::builder()
-                        .transient_for(&relm4::main_application().active_window().unwrap())
+                    let warning_message = adw::AlertDialog::builder()
                         .heading(fl!("close-pinned-tab-confirmation-header"))
                         .body(fl!("close-pinned-tab-confirmation-body"))
                         .build();
@@ -355,7 +354,7 @@ impl AsyncComponent for AppModel {
                     warning_message
                         .set_response_appearance("yes", adw::ResponseAppearance::Destructive);
 
-                    warning_message.set_visible(true);
+                    warning_message.present(&relm4::main_application().active_window().unwrap());
 
                     warning_message.connect_response(
                         None,

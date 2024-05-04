@@ -75,7 +75,7 @@ impl Component for AboutWindow {
     ) {
         match message {
             AboutWindowInput::ShowWindow => {
-                let about_window = adw::AboutWindow::builder()
+                let about_window = adw::AboutDialog::builder()
                     .application_name(APP_NAME)
                     .version(env!("CARGO_PKG_VERSION"))
                     .license_type(gtk::License::Gpl30Only)
@@ -84,8 +84,6 @@ impl Component for AboutWindow {
                     .copyright("© 2024 zefr0x")
                     .website(env!("CARGO_PKG_HOMEPAGE"))
                     .issue_url("https://github.com/zefr0x/stackbloatless/issues")
-                    .application(&relm4::main_application())
-                    .transient_for(&widgets.main_parent_window)
                     .debug_info(format!(
                         "[rust]\n\
                         {}\n\
@@ -133,7 +131,7 @@ impl Component for AboutWindow {
                     "https://github.com/zefr0x/stackbloatless/blob/main/CHANGELOG.md",
                 );
 
-                about_window.present();
+                about_window.present(&widgets.main_parent_window);
             }
         }
     }
