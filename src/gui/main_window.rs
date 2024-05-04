@@ -1,20 +1,15 @@
-use adw::prelude::*;
 use relm4::{
     actions::AccelsPlus,
-    adw::traits::AdwWindowExt,
+    adw::{self, prelude::*},
     component::{
         AsyncComponent, AsyncComponentController, AsyncComponentParts, AsyncComponentSender,
         AsyncController, Connector,
     },
     factory::FactoryVecDeque,
-    gtk::{
-        prelude::ApplicationExt,
-        traits::{GtkApplicationExt, WidgetExt},
-    },
     loading_widgets::LoadingWidgets,
     prelude::*,
 };
-use relm4_icons::icon_name;
+use relm4_icons::icon_names;
 
 use super::about_dialog::{AboutWindow, AboutWindowInput};
 use super::componant_builders;
@@ -51,7 +46,6 @@ pub struct AppWidgets {
     sidebar_toggle_button: gtk::ToggleButton,
 }
 
-#[relm4::async_trait::async_trait(?Send)]
 impl AsyncComponent for AppModel {
     type Init = AppInit;
     type Root = adw::Window;
@@ -91,7 +85,7 @@ impl AsyncComponent for AppModel {
 
         // Load CSS
         let provider = gtk::CssProvider::new();
-        provider.load_from_data(include_str!("style.css"));
+        provider.load_from_string(include_str!("style.css"));
         if let Some(display) = gtk::gdk::Display::default() {
             gtk::style_context_add_provider_for_display(
                 &display,
@@ -180,7 +174,7 @@ impl AsyncComponent for AppModel {
 
         // Create hamburger menu
         let menu_button = gtk::MenuButton::builder()
-            .icon_name(icon_name::MENU_LARGE)
+            .icon_name(icon_names::MENU_LARGE)
             .menu_model(&main_menu)
             .build();
 
@@ -276,7 +270,7 @@ impl AsyncComponent for AppModel {
 
         // Create sidebar button in the header
         let sidebar_toggle_button = gtk::ToggleButton::builder()
-            .icon_name(icon_name::DOCK_RIGHT)
+            .icon_name(icon_names::DOCK_RIGHT)
             .build();
         header.pack_end(&sidebar_toggle_button);
 
@@ -361,7 +355,7 @@ impl AsyncComponent for AppModel {
                     warning_message
                         .set_response_appearance("yes", adw::ResponseAppearance::Destructive);
 
-                    warning_message.show();
+                    warning_message.set_visible(true);
 
                     warning_message.connect_response(
                         None,

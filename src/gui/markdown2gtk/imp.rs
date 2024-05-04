@@ -1,8 +1,11 @@
 use std::str::FromStr;
 
 use markdown::mdast;
-use relm4::gtk::{self, prelude::*};
-use relm4_icons::icon_name;
+use relm4::{
+    adw,
+    gtk::{self, prelude::*},
+};
+use relm4_icons::icon_names;
 
 use super::cell_object::CellObject;
 
@@ -286,7 +289,7 @@ impl MarkdownView {
                         .insert_child_anchor(&mut self.buf.end_iter(), &anchor);
 
                     let icon = gtk::Image::builder()
-                        .icon_name(icon_name::EARTH)
+                        .icon_name(icon_names::EARTH)
                         .margin_end(3)
                         .tooltip_text(&link.url)
                         .build();

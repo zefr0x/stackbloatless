@@ -1,7 +1,6 @@
 use std::str::FromStr;
 
-use adw::prelude::*;
-use relm4::prelude::*;
+use relm4::{adw, gtk::prelude::*, prelude::*};
 
 use super::markdown2gtk::MarkdownView;
 use crate::api::stackexchange::{Answer, Comment, DateExt, Question, User};

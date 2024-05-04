@@ -3,7 +3,7 @@ use relm4::{
     gtk::prelude::*,
     prelude::*,
 };
-use relm4_icons::icon_name;
+use relm4_icons::icon_names;
 
 use crate::fl;
 
@@ -14,7 +14,6 @@ pub struct SideBarWidgest;
 #[derive(Debug)]
 pub struct SideBarInput;
 
-#[relm4::async_trait::async_trait(?Send)]
 impl SimpleAsyncComponent for SideBarModel {
     type Init = ();
     type Root = gtk::Box;
@@ -54,11 +53,11 @@ impl SimpleAsyncComponent for SideBarModel {
             &adw::StatusPage::builder()
                 .title("Bookmarks")
                 .child(&gtk::Label::new(Some(&fl!("placeholder"))))
-                .icon_name(icon_name::LIBRARY)
+                .icon_name(icon_names::LIBRARY)
                 .build(),
             None,
             "Bookmarks",
-            icon_name::LIBRARY,
+            icon_names::LIBRARY,
         );
 
         // TODO: Implement history
@@ -66,11 +65,11 @@ impl SimpleAsyncComponent for SideBarModel {
             &adw::StatusPage::builder()
                 .title("History")
                 .child(&gtk::Label::new(Some(&fl!("placeholder"))))
-                .icon_name(icon_name::HISTORY_UNDO)
+                .icon_name(icon_names::HISTORY_UNDO)
                 .build(),
             None,
             "History",
-            icon_name::HISTORY_UNDO,
+            icon_names::HISTORY_UNDO,
         );
 
         let widgets = SideBarWidgest {};

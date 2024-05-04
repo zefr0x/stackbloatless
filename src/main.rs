@@ -1,4 +1,4 @@
-use adw::prelude::*;
+use relm4::adw::{self, prelude::*};
 use relm4::gtk;
 
 mod api;

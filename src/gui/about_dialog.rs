@@ -1,5 +1,5 @@
 use relm4::{
-    adw::prelude::*,
+    adw::{self, prelude::*},
     component::{Component, ComponentParts},
     prelude::*,
     ComponentSender,
