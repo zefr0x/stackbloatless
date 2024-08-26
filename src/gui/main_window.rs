@@ -5,7 +5,7 @@ use relm4::{
         AsyncComponent, AsyncComponentController, AsyncComponentParts, AsyncComponentSender,
         AsyncController, Connector,
     },
-    factory::FactoryVecDeque,
+    factory::{FactoryVecDeque, FactoryView},
     loading_widgets::LoadingWidgets,
     prelude::*,
 };
@@ -233,6 +233,18 @@ impl AsyncComponent for AppModel {
             .forward(sender.input_sender(), |_message| unreachable!());
         // A refrence for TabView that is owned by FactoryVecDeque.
         let tab_view = questions_tabs.widget();
+
+        // TODO: Implement close event handler.
+        tab_view.connect_close_page(gtk::glib::clone!(@strong sender => move |tab_view, page| {
+            // TODO: Remove them from the FactoryVecDeque.
+            tab_view.factory_remove(page);
+            true
+        }));
+
+        // FIX: Sync position: https://github.com/Relm4/Relm4/issues/573
+        // tab_view.connect_page_reordered(|tab_view, tab_page, position| {
+        //     tab_view.factory_update_position(tab_page, &());
+        // });
 
         tab_bar.set_view(Some(tab_view));
 
