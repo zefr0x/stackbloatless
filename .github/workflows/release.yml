@@ -33,6 +33,7 @@ jobs:
     name: build-release
     needs: ["create-release"]
     runs-on: ${{ matrix.os }}
+    container: ${{ matrix.container }}
     env:
       TARGET_DIR: ./target
       # Emit backtraces on panics.
@@ -43,11 +44,15 @@ jobs:
         include:
           - build: linux
             os: ubuntu-latest
+            container: fedora:40
             rust: stable
-            target: x86_64-unknown-linux-musl
+            target: x86_64-unknown-linux-gnu
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+      - name: Install System Deps
+        shell: bash
+        run: |
+          sudo dnf upgrade --refresh -y
+          sudo dnf install -y gcc gcc-c++ clang python3 make cmake meson git gh kernel-devel gtk4-devel libadwaita-devel appstream-devel desktop-file-utils
 
       - name: Install Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -55,22 +60,21 @@ jobs:
           toolchain: ${{ matrix.rust }}
           target: ${{ matrix.target }}
 
-      - name: Install System Deps
-        shell: bash
-        run: sudo apt install libadwaita-1-dev desktop-file-utils meson -y
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
       - name: Setup
-        run: meson build
+        run: meson setup builddir
 
       - name: Build
-        run: meson install -C build --destdir "builds/${{ matrix.target }}"
+        run: meson install -C builddir --destdir "builds/${{ matrix.target }}"
 
       - name: Create Archive
         shell: bash
         run: |
           archive="stackbloatless-${{ needs.create-release.outputs.version }}-${{ matrix.target }}.tar.gz"
 
-          tar -C "build/builds/" --create "${{ matrix.target }}/" --gzip --file "$archive"
+          tar -C "builddir/builds/" --create "${{ matrix.target }}/" --gzip --file "$archive"
           echo "ASSET=$archive" >> $GITHUB_ENV
 
       - name: Upload Release Archive
