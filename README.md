@@ -1,3 +1,6 @@
+> [!Warning]
+> This project is no longer beeing worked on any more. If you are interested, it's free software under the GPL-3.0 license.
+
 <div align = center>
 
 <h1>StackBloatLess</h1>
